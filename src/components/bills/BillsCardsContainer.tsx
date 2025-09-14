@@ -64,6 +64,17 @@ export const BillsCardsContainer: React.FC<HolderProps> = ({ title = "Bills", em
         }
     };
 
+    const handleDeleteBill = async (id: number) => {
+        try {
+            await fetch(`http://localhost:3000/bills/${id}`, {
+                method: "DELETE",
+            });
+            loadBills();
+        } catch (err) {
+            console.error("Error deleting bill:", err);
+        }
+    }
+
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
@@ -148,7 +159,7 @@ export const BillsCardsContainer: React.FC<HolderProps> = ({ title = "Bills", em
                 )}
 
                 {Array.isArray(billsArray) && billsArray.length > 0 ? (
-                    <BillsCards bills={billsArray} currency={currency} />
+                    <BillsCards bills={billsArray} currency={currency} onDelete={handleDeleteBill} />
                 ) : (
                     <div className="rounded-lg border border-dashed border-slate-200 p-8 text-center text-slate-500">{emptyMessage}</div>
                 )}

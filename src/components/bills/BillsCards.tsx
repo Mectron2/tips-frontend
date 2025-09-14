@@ -4,17 +4,18 @@ import type { Bill } from "./types";
 
 type BillsCardsProps = {
     bills?: Bill[];
-    currency?: string;
+    currency: string;
     onOpen?: (bill: Bill) => void;
     onEdit?: (bill: Bill) => void;
+    onDelete: (id: number) => void;
 };
 
-export const BillsCards: React.FC<BillsCardsProps> = ({ bills = [], currency = "EUR" }) => {
+export const BillsCards: React.FC<BillsCardsProps> = ({ bills = [], currency, onDelete }) => {
     return (
         <>
             <div className="flex flex-col gap-4 w-full items-center">
                 {bills.map((bill) => (
-                    <BillCard key={bill.id} bill={bill} currency={currency} />
+                    <BillCard key={bill.id} bill={bill} currency={currency} onDelete={onDelete} />
                 ))}
             </div>
         </>

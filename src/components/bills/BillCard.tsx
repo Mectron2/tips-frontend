@@ -4,9 +4,8 @@ import { useNavigate } from "react-router-dom";
 
 type Props = {
     bill: Bill;
-    currency?: string;
-    onOpen?: (bill: Bill) => void;
-    onEdit?: (bill: Bill) => void;
+    currency: string;
+    onDelete: (id: number) => void;
 };
 
 function formatCurrency(value: number, currency = "EUR") {
@@ -30,7 +29,7 @@ function formatDate(iso?: string) {
     return d.toLocaleString();
 }
 
-export const BillCard: React.FC<Props> = memo(({ bill, currency = "EUR" }) => {
+export const BillCard: React.FC<Props> = memo(({ bill, currency, onDelete }) => {
     const amount = parseFloat(bill.amount ?? "0") || 0;
     const tipPercent = parseFloat(bill.tipPercent ?? "0") || 0;
     const tipAmountComputed =
@@ -39,7 +38,14 @@ export const BillCard: React.FC<Props> = memo(({ bill, currency = "EUR" }) => {
     const navigate = useNavigate();
 
     return (
-        <article className="bg-white dark:bg-slate-800 rounded-2xl shadow p-4 flex flex-col justify-between w-full" onClick={() => navigate(`/bills/${bill.id}`)}>
+        <article className="bg-white dark:bg-slate-800 rounded-2xl shadow p-4 flex flex-col justify-between w-full relative"
+                 onClick={() => navigate(`/bills/${bill.id}`)}>
+            <button className="absolute top-2 right-2 text-red-500 hover:text-red-700 text-xl font-bold"
+                    aria-label="Remove participant"
+                onClick={(e) => {
+                e.stopPropagation();
+                onDelete(bill.id)}
+            }>×</button>
             <header className="flex items-start justify-between mb-3">
                 <div>
                     <h3 className="text-lg font-semibold">Bill #{bill.id}</h3>
