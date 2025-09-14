@@ -5,13 +5,17 @@ import type {Participant, ParticipantCalculation} from "./types";
 interface AddParticipantsProps {
     tipsPercent: number | null;
     billAmount: number;
+    initialParticipants?: Participant[];
 }
 
 export const AddParticipants: React.FC<AddParticipantsProps> = ({
                                                                     tipsPercent,
                                                                     billAmount,
+                                                                    initialParticipants,
                                                                 }) => {
-    const [participants, setParticipants] = useState<Participant[]>([
+    const [participants, setParticipants] = useState<Participant[]>(
+        initialParticipants ?
+        initialParticipants : [
         {
             id: 1,
             name: "",
@@ -114,7 +118,7 @@ export const AddParticipants: React.FC<AddParticipantsProps> = ({
     };
 
     const addParticipant = () => {
-        const newId = participants[participants.length - 1].id + 1;
+        const newId = parseInt(Date.now().toString(), 10);
         setParticipants(prev => [
             ...prev,
             {

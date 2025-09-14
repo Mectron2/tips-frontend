@@ -93,7 +93,7 @@ export const BillPage: React.FC<BillPageProps> = ({ bill }) => {
                     </p>
                 )}
             </div>
-            <AddParticipants tipsPercent={bill.tipPercent} billAmount={bill.amount} />
+            <AddParticipants tipsPercent={bill.tipPercent} billAmount={bill.amount} initialParticipants={bill.participants} />
         </div>
     );
 };
