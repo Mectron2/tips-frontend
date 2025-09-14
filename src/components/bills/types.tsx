@@ -20,7 +20,6 @@ export type BillDto = {
     id: number;
     amount: number;
     tipPercent: number | null;
-    tipAmount: number | null;
     createdAt: string;
     updatedAt: string;
     totalAmount?: number;
@@ -31,7 +30,6 @@ export type Bill = {
     id: number;
     amount: string;
     tipPercent: string;
-    tipAmount?: string | null;
     createdAt: string;
     updatedAt: string;
     participants: Participant[];

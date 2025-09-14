@@ -27,13 +27,6 @@ export const BillPage: React.FC<BillPageProps> = ({ bill, onReload }) => {
                         </p>
                     )}
 
-                    {bill.tipAmount !== null && (
-                        <p className="text-sm text-slate-100">
-                            <span className="font-medium">Tip Amount:</span>{" "}
-                            ${bill.tipAmount.toFixed(2)}
-                        </p>
-                    )}
-
                     {bill.totalAmount !== undefined && (
                         <p className="text-sm text-slate-100">
                             <span className="font-medium">Total Amount:</span>{" "}
