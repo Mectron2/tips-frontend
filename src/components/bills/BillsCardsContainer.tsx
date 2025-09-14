@@ -24,7 +24,7 @@ export const BillsCardsContainer: React.FC<HolderProps> = ({ title = "Bills", em
 
     return (
         loading ? <div className="text-center p-6">Loading...</div> :
-        <section className={`max-w-6xl mx-auto p-6`}>
+        <section className={`max-w-3xl mx-auto p-6`}>
             <div className="flex items-center justify-between mb-4">
                 <h2 className="text-2xl font-semibold">{title}</h2>
                 <div className="text-sm text-slate-500">Total: {Array.isArray(billsArray) ? billsArray.length : 0}</div>

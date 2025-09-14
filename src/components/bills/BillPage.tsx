@@ -4,12 +4,13 @@ import {AddParticipants} from "../participants/AddParticipants.tsx";
 
 interface BillPageProps {
     bill: BillDto;
+    onReload: () => void;
 }
 
-export const BillPage: React.FC<BillPageProps> = ({ bill }) => {
+export const BillPage: React.FC<BillPageProps> = ({ bill, onReload }) => {
     return (
         <div className="max-w-4xl mx-auto p-6">
-            <div className="bg-gray-800 shadow rounded-2xl p-6">
+            <div className="bg-gray-800 shadow rounded-2xl p-6 mb-8">
                 <h1 className="text-2xl font-bold mb-4">
                     Bill <span className="text-blue-600">#{bill.id}</span>
                 </h1>
@@ -95,6 +96,7 @@ export const BillPage: React.FC<BillPageProps> = ({ bill }) => {
             </div>
             <AddParticipants tipsPercent={bill.tipPercent} billAmount={bill.amount}
                              initialParticipants={bill.participants} billId={bill.id}
+                             onReload={onReload}
             />
         </div>
     );

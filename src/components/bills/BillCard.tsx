@@ -39,7 +39,7 @@ export const BillCard: React.FC<Props> = memo(({ bill, currency = "EUR" }) => {
     const navigate = useNavigate();
 
     return (
-        <article className="bg-white dark:bg-slate-800 rounded-2xl shadow p-4 flex flex-col justify-between" onClick={() => navigate(`/bills/${bill.id}`)}>
+        <article className="bg-white dark:bg-slate-800 rounded-2xl shadow p-4 flex flex-col justify-between w-full" onClick={() => navigate(`/bills/${bill.id}`)}>
             <header className="flex items-start justify-between mb-3">
                 <div>
                     <h3 className="text-lg font-semibold">Bill #{bill.id}</h3>

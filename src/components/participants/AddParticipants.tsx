@@ -1,12 +1,13 @@
-import React, {useState, useMemo, useEffect} from "react";
+import React, {useState, useMemo} from "react";
 import { ParticipantCards } from "./ParticipantCards";
-import type {Participant, ParticipantCalculation} from "./types";
+import {type Participant, type ParticipantCalculation, ParticipantDto} from "./types";
 
 interface AddParticipantsProps {
     tipsPercent: number | null;
     billAmount: number;
     initialParticipants?: Participant[];
     billId: number;
+    onReload: () => void;
 }
 
 export const AddParticipants: React.FC<AddParticipantsProps> = ({
@@ -14,6 +15,7 @@ export const AddParticipants: React.FC<AddParticipantsProps> = ({
                                                                     billAmount,
                                                                     initialParticipants,
                                                                     billId,
+                                                                    onReload
                                                                 }) => {
     const [participants, setParticipants] = useState<Participant[]>(
         initialParticipants ?
@@ -26,10 +28,6 @@ export const AddParticipants: React.FC<AddParticipantsProps> = ({
             customAmount: null,
         },
     ]);
-
-    useEffect(() => {
-        console.log(participants);
-    }, [participants]);
 
     const totalTips = tipsPercent ? billAmount * tipsPercent : 0;
 
@@ -134,6 +132,27 @@ export const AddParticipants: React.FC<AddParticipantsProps> = ({
         ]);
     };
 
+    const saveParticipants = async () => {
+        const payload: ParticipantDto[] = participants.map(p => {
+            return new ParticipantDto(p.name, p.customPercent, p.customAmount);
+        });
+
+        await fetch(`http://localhost:3000/participant/bill/${billId}`, {
+            method: "DELETE"
+        });
+
+        await fetch("http://localhost:3000/participant", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                billId,
+                createParticipantDtos: payload
+            })
+        })
+    }
+
     const removeParticipant = (participantId: number) => {
         setParticipants(prev => prev.filter(p => p.id !== participantId));
     };
@@ -142,8 +161,13 @@ export const AddParticipants: React.FC<AddParticipantsProps> = ({
     const remainingTips = totalTips - totalAllocated;
 
     return (
-        <div className="space-y-6">
-            <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
+        <form className="space-y-6"
+            onSubmit={async (e) => {
+            e.preventDefault()
+            await saveParticipants()
+            onReload()
+        }}>
+            <div className="bg-blue-50 dark:bg-blue-950 p-4 rounded-lg">
                 <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-2">
                     Tips Summary
                 </h3>
@@ -183,10 +207,11 @@ export const AddParticipants: React.FC<AddParticipantsProps> = ({
 
             <div className="flex gap-4 items-center">
                 <button
+                    type="button"
                     onClick={addParticipant}
-                    className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md text-sm font-medium transition-colors"
+                    className="bg-blue-600 hover:bg-blue-700 text-white rounded-md text-sm font-medium transition-colors w-full p-3"
                 >
-                    + Add Participant
+                    Add Participant
                 </button>
             </div>
 
@@ -195,6 +220,37 @@ export const AddParticipants: React.FC<AddParticipantsProps> = ({
                 onChange={handleParticipantChange}
                 onRemove={removeParticipant}
             />
-        </div>
+
+            <div className="flex gap-4 items-center">
+                <button
+                    disabled={remainingTips < 0}
+                    className="bg-yellow-500 hover:bg-yellow-700 text-white rounded-md text-sm font-medium
+                    transition-colors w-full p-3 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                    Save
+                </button>
+            </div>
+
+            <div className="flex gap-4 items-center">
+                <button
+                    type="button"
+                    className="bg-red-600 hover:bg-red-800 text-white rounded-md text-sm font-medium
+                    transition-colors w-full p-3 disabled:opacity-50 disabled:cursor-not-allowed"
+                    onClick={() => {
+                        setParticipants(initialParticipants || [
+                        {
+                            id: parseInt(Date.now().toString(), 10),
+                            billId,
+                            name: "",
+                            customPercent: null,
+                            customAmount: null,
+                        },
+                        ]);
+                    }}
+                >
+                    Reset
+                </button>
+            </div>
+        </form>
     );
 };

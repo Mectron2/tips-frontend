@@ -25,7 +25,6 @@ export const ParticipantCards: React.FC<ParticipantCardsProps> = ({
                     participant={participant}
                     onChange={onChange}
                     onRemove={onRemove}
-                    canRemove={participants.length > 1}
                 />
             ))}
         </div>

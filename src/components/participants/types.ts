@@ -10,3 +10,15 @@ export interface ParticipantCalculation extends Participant {
     effectivePercent: number;
     totalAmount: number;
 }
+
+export class ParticipantDto {
+    name: string | null;
+    customPercent?: number | null
+    customAmount?: number | null;
+
+    constructor(name: string | null, customPercent?: number | null, customAmount?: number | null) {
+        this.name = name;
+        this.customPercent = customPercent;
+        this.customAmount = customAmount;
+    }
+}

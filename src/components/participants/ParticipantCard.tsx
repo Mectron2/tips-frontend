@@ -9,14 +9,12 @@ interface ParticipantCardProps {
         customAmount?: number | null;
     }) => void;
     onRemove?: (participantId: number) => void;
-    canRemove?: boolean;
 }
 
 export const ParticipantCard: React.FC<ParticipantCardProps> = ({
                                                                     participant,
                                                                     onChange,
                                                                     onRemove,
-                                                                    canRemove = false,
                                                                 }) => {
     const [name, setName] = useState(participant.name);
     const [customPercent, setCustomPercent] = useState<string>(
@@ -59,7 +57,7 @@ export const ParticipantCard: React.FC<ParticipantCardProps> = ({
 
     return (
         <div className="bg-white dark:bg-slate-800 shadow rounded-xl p-4 space-y-3 relative">
-            {canRemove && (
+            {
                 <button
                     onClick={() => onRemove?.(participant.id)}
                     className="absolute top-2 right-2 text-red-500 hover:text-red-700 text-xl font-bold"
@@ -67,7 +65,7 @@ export const ParticipantCard: React.FC<ParticipantCardProps> = ({
                 >
                     ×
                 </button>
-            )}
+            }
 
             <div>
                 <label className="block text-sm font-medium text-slate-700 dark:text-slate-300">
@@ -76,6 +74,7 @@ export const ParticipantCard: React.FC<ParticipantCardProps> = ({
                 <input
                     type="text"
                     value={name}
+                    required={true}
                     onChange={(e) => setName(e.target.value)}
                     className="mt-1 w-full rounded-md border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-blue-500"
                     placeholder="Participant Name"
