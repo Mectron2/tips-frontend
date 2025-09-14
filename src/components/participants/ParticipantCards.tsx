@@ -17,9 +17,12 @@ export const ParticipantCards: React.FC<ParticipantCardsProps> = ({
                                                                       onChange,
                                                                       onRemove,
                                                                   }) => {
+    const sortedParticipants = [...participants]
+        .sort((a, b) => b.id - a.id);
+
     return (
         <div className="space-y-4">
-            {participants.map((participant) => (
+            {sortedParticipants.map((participant) => (
                 <ParticipantCard
                     key={participant.id}
                     participant={participant}
