@@ -6,18 +6,21 @@ interface AddParticipantsProps {
     tipsPercent: number | null;
     billAmount: number;
     initialParticipants?: Participant[];
+    billId: number;
 }
 
 export const AddParticipants: React.FC<AddParticipantsProps> = ({
                                                                     tipsPercent,
                                                                     billAmount,
                                                                     initialParticipants,
+                                                                    billId,
                                                                 }) => {
     const [participants, setParticipants] = useState<Participant[]>(
         initialParticipants ?
         initialParticipants : [
         {
-            id: 1,
+            id: parseInt(Date.now().toString(), 10),
+            billId,
             name: "",
             customPercent: null,
             customAmount: null,
@@ -123,6 +126,7 @@ export const AddParticipants: React.FC<AddParticipantsProps> = ({
             ...prev,
             {
                 id: newId,
+                billId,
                 name: "",
                 customPercent: null,
                 customAmount: null,

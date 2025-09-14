@@ -1,6 +1,7 @@
 export interface Participant {
     id: number;
     name: string;
+    billId: number;
     customPercent?: number | null;
     customAmount?: number | null;
 }
