@@ -38,11 +38,6 @@ export const BillCard: React.FC<Props> = memo(({ bill, currency }) => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
-    const handleDelete = (id: number) => {
-        dispatch(removeBill(id));
-        dispatch(deleteBill(id));
-    };
-
     return (
         <article className="bg-white dark:bg-slate-800 rounded-2xl shadow p-4 flex flex-col justify-between w-full relative"
                  onClick={() => navigate(`/bills/${bill.id}`)}>
@@ -50,7 +45,7 @@ export const BillCard: React.FC<Props> = memo(({ bill, currency }) => {
                     aria-label="Remove participant"
                 onClick={(e) => {
                 e.stopPropagation();
-                handleDelete(bill.id)}
+                dispatch(deleteBill(bill.id))}
             }>×</button>
             <header className="flex items-start justify-between mb-3">
                 <div>
