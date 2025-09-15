@@ -20,7 +20,6 @@ export const BillsCards: React.FC<BillsCardsProps> = ({ currency }) => {
 
     useEffect(() => {
         dispatch(loadBills());
-        console.log("Invoked");
     }, [dispatch]);
 
     return (

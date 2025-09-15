@@ -103,4 +103,3 @@ export const billsSlice = createSlice({
 });
 
 export const { addBill, removeBill } = billsSlice.actions;
-export default billsSlice.reducer;

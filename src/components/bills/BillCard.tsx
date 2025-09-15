@@ -2,7 +2,7 @@ import React, { memo } from "react";
 import type {Bill} from "./types";
 import { useNavigate } from "react-router-dom";
 import {useDispatch} from "react-redux";
-import {deleteBill, removeBill} from "../../redux/bills/slices/billsSlice.ts";
+import {deleteBill} from "../../redux/bills/slices/billsSlice.ts";
 
 type Props = {
     bill: Bill;

@@ -8,8 +8,28 @@ interface BillPageProps {
 }
 
 export const BillPage: React.FC<BillPageProps> = ({ bill, onReload }) => {
+    const [isInEditMode, setIsInEditMode] = React.useState(false);
+    const [editedAmount, setEditedAmount] = React.useState(bill.amount);
+    const [editedTipPercent, setEditedTipPercent] = React.useState(bill.tipPercent);
+
+    const handleSave = async () => {
+        await fetch(`http://localhost:3000/bills/${bill.id}`, {
+            method: "PATCH",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                amount: editedAmount,
+                tipPercent: editedTipPercent / 100,
+            }),
+        })
+        onReload();
+        setIsInEditMode(false);
+    }
+
     return (
-        <div className="max-w-4xl mx-auto p-6">
+        <div className="max-w-4xl mx-auto p-6 relative">
+            <button onClick={() => setIsInEditMode(!isInEditMode)} className="absolute right-8 top-8">Edit</button>
             <div className="bg-gray-800 shadow rounded-2xl p-6 mb-8">
                 <h1 className="text-2xl font-bold mb-4">
                     Bill <span className="text-blue-600">#{bill.id}</span>
@@ -17,14 +37,29 @@ export const BillPage: React.FC<BillPageProps> = ({ bill, onReload }) => {
 
                 <div className="space-y-2 mb-6">
                     <p className="text-sm text-slate-100">
-                        <span className="font-medium">Amount:</span>{" "}
-                        ${bill.amount.toFixed(2)}
+                        {isInEditMode ? (
+                            <input type="number" defaultValue={bill.amount.toFixed(2)} className="bg-gray-700 text-white rounded px-2 py-1 w-32 text-right"
+                            onChange={(e) => {setEditedAmount(parseFloat(e.target.value))}}/>
+                        ) : (
+                        <span className="font-medium">Amount: ${bill.amount.toFixed(2)}</span>
+                            )}
                     </p>
 
                     {bill.tipPercent !== null && (
                         <p className="text-sm text-slate-100">
-                            <span className="font-medium">Tip Percent:</span> {bill.tipPercent}%
+                            {isInEditMode ? (
+                                <input type="number" defaultValue={bill.tipPercent * 100} className="bg-gray-700 text-white rounded px-2 py-1 w-32 text-right"
+                                       onChange={(e) => {setEditedTipPercent(parseFloat(e.target.value))}}/>
+                            ) : (
+                                <span className="font-medium">Tip Percent: {bill.tipPercent * 100}%</span>
+                            )}
                         </p>
+                    )}
+
+                    {isInEditMode && (
+                        <button onClick={handleSave} className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+                            Save
+                        </button>
                     )}
 
                     {bill.totalAmount !== undefined && (
