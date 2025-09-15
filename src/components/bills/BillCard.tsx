@@ -1,16 +1,17 @@
 import React, { memo } from "react";
 import type {Bill} from "./types";
 import { useNavigate } from "react-router-dom";
+import {useDispatch} from "react-redux";
+import {deleteBill, removeBill} from "../../redux/bills/slices/billsSlice.ts";
 
 type Props = {
     bill: Bill;
     currency: string;
-    onDelete: (id: number) => void;
 };
 
 function formatCurrency(value: number, currency = "EUR") {
     if (!isFinite(value)) return "—";
-    return new Intl.NumberFormat("ru-RU", {
+    return new Intl.NumberFormat("ua-UA", {
         style: "currency",
         currency,
         maximumFractionDigits: 2,
@@ -29,12 +30,18 @@ function formatDate(iso?: string) {
     return d.toLocaleString();
 }
 
-export const BillCard: React.FC<Props> = memo(({ bill, currency, onDelete }) => {
+export const BillCard: React.FC<Props> = memo(({ bill, currency }) => {
     const amount = parseFloat(bill.amount ?? "0") || 0;
     const tipPercent = parseFloat(bill.tipPercent ?? "0") || 0;
     const tipAmountComputed = amount * tipPercent;
     const participantsCount = Array.isArray(bill.participants) ? bill.participants.length : 0;
     const navigate = useNavigate();
+    const dispatch = useDispatch();
+
+    const handleDelete = (id: number) => {
+        dispatch(removeBill(id));
+        dispatch(deleteBill(id));
+    };
 
     return (
         <article className="bg-white dark:bg-slate-800 rounded-2xl shadow p-4 flex flex-col justify-between w-full relative"
@@ -43,7 +50,7 @@ export const BillCard: React.FC<Props> = memo(({ bill, currency, onDelete }) => 
                     aria-label="Remove participant"
                 onClick={(e) => {
                 e.stopPropagation();
-                onDelete(bill.id)}
+                handleDelete(bill.id)}
             }>×</button>
             <header className="flex items-start justify-between mb-3">
                 <div>
