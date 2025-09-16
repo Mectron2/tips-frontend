@@ -2,7 +2,7 @@ import { BillsCards } from "./BillsCards.tsx";
 import React, { useState } from "react";
 import type { Bill } from "./types.tsx";
 import {useDispatch, useSelector} from "react-redux";
-import {createBill} from "../../redux/bills/slices/billsSlice.ts";;
+import {createBill} from "../../redux/bills/slices/billsSlice.ts";
 
 type HolderProps = {
     bills?: Bill[];
@@ -12,10 +12,11 @@ type HolderProps = {
     className?: string;
 };
 
-export const BillsCardsContainer: React.FC<HolderProps> = ({ title = "Bills", currency = "USD" }) => {
+export const BillsCardsContainer: React.FC<HolderProps> = ({ title = "Bills"}) => {
     const bills = useSelector((state) => state.bills);
     const dispatch = useDispatch();
     const [showCreateForm, setShowCreateForm] = useState(false);
+    const [newBillCurrency, setNewBillCurrency] = useState("USD");
     const [formData, setFormData] = useState({
         amount: "",
         tipPercent: ""
@@ -54,8 +55,9 @@ export const BillsCardsContainer: React.FC<HolderProps> = ({ title = "Bills", cu
                         <h3 className="text-lg font-semibold mb-4">Create New Bill</h3>
                         <form onSubmit={handleCreateBill} className="space-y-4">
                             <div>
-                                <label htmlFor="amount" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
-                                    Amount ({currency})
+                                <label htmlFor="amount"
+                                       className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+                                    Amount ({newBillCurrency})
                                 </label>
                                 <input
                                     type="number"
@@ -71,7 +73,8 @@ export const BillsCardsContainer: React.FC<HolderProps> = ({ title = "Bills", cu
                                 />
                             </div>
                             <div>
-                                <label htmlFor="tipPercent" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+                                <label htmlFor="tipPercent"
+                                       className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
                                     Tip Percentage (%)
                                 </label>
                                 <input
@@ -88,9 +91,14 @@ export const BillsCardsContainer: React.FC<HolderProps> = ({ title = "Bills", cu
                                     placeholder="15"
                                 />
                             </div>
+                            <select name="select" onChange={(e) => setNewBillCurrency(e.target.value)}>
+                                <option value="USD" selected>USD</option>
+                                <option value="UAH">UAH</option>
+                            </select>
                             <div className="flex gap-3">
                                 <button
                                     type="submit"
+                                    onClick={() => setShowCreateForm(false)}
                                     className="bg-green-600 hover:bg-green-700 disabled:bg-slate-400 disabled:cursor-not-allowed text-white px-4 py-2 rounded-md font-medium transition-colors"
                                 >
                                     {"Create Bill"}
@@ -99,7 +107,7 @@ export const BillsCardsContainer: React.FC<HolderProps> = ({ title = "Bills", cu
                                     type="button"
                                     onClick={() => {
                                         setShowCreateForm(false);
-                                        setFormData({ amount: "", tipPercent: "" });
+                                        setFormData({amount: "", tipPercent: ""});
                                     }}
                                     className="bg-slate-500 hover:bg-slate-600 text-white px-4 py-2 rounded-md font-medium transition-colors"
                                 >
@@ -110,7 +118,7 @@ export const BillsCardsContainer: React.FC<HolderProps> = ({ title = "Bills", cu
                     </div>
                 )}
 
-                <BillsCards currency={currency} />
+                <BillsCards/>
             </section>
     );
 };

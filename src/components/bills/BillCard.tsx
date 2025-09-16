@@ -31,7 +31,7 @@ function formatDate(iso?: string) {
 }
 
 export const BillCard: React.FC<Props> = memo(({ bill, currency }) => {
-    const amount = parseFloat(bill.amount ?? "0") || 0;
+    const amount = bill.amount * bill.currency.exchangeRate || 0;
     const tipPercent = parseFloat(bill.tipPercent ?? "0") || 0;
     const tipAmountComputed = amount * tipPercent;
     const participantsCount = Array.isArray(bill.participants) ? bill.participants.length : 0;

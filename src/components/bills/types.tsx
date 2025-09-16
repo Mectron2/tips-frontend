@@ -29,7 +29,14 @@ export type BillDto = {
 export type Bill = {
     id: number;
     amount: string;
+    amountInSpecifiedCurrency: string;
     tipPercent: string;
+    currency: {
+        id: number;
+        symbol: string;
+        name: string;
+        exchangeRate: string;
+    }
     createdAt: string;
     updatedAt: string;
     participants: Participant[];
