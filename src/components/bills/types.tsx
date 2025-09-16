@@ -10,8 +10,14 @@ export type ParticipantDto = {
     id: number;
     billId: number;
     name: string;
-    declaredPercent?: number;
-    declaredAmount?: number;
+    currency: {
+        id: number;
+        symbol: string;
+        name: string;
+        exchangeRate: string;
+    }
+    customPercent?: number;
+    customAmount?: number;
     totalAmount?: number;
     effectivePercent?: number;
 }
@@ -19,6 +25,13 @@ export type ParticipantDto = {
 export type BillDto = {
     id: number;
     amount: number;
+    amountInSpecifiedCurrency: number;
+    currency: {
+        id: number;
+        symbol: string;
+        name: string;
+        exchangeRate: string;
+    }
     tipPercent: number | null;
     createdAt: string;
     updatedAt: string;

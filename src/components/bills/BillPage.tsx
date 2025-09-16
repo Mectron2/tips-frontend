@@ -1,6 +1,7 @@
 import React from "react";
 import type { BillDto } from "./types.tsx";
-import {AddParticipants} from "../participants/AddParticipants.tsx";
+import {AddParticipants, CurrencyDto} from "../participants/AddParticipants.tsx";
+import { formatCurrency } from "../../utils/currencyFuncs.ts";
 
 interface BillPageProps {
     bill: BillDto;
@@ -9,8 +10,13 @@ interface BillPageProps {
 
 export const BillPage: React.FC<BillPageProps> = ({ bill, onReload }) => {
     const [isInEditMode, setIsInEditMode] = React.useState(false);
-    const [editedAmount, setEditedAmount] = React.useState(bill.amount);
-    const [editedTipPercent, setEditedTipPercent] = React.useState(bill.tipPercent);
+
+    const [editedAmount, setEditedAmount] = React.useState<number>(
+        bill.amountInSpecifiedCurrency
+    );
+    const [editedTipPercent, setEditedTipPercent] = React.useState<number | null>(
+        bill.tipPercent
+    );
 
     const handleSave = async () => {
         await fetch(`http://localhost:3000/bills/${bill.id}`, {
@@ -20,54 +26,96 @@ export const BillPage: React.FC<BillPageProps> = ({ bill, onReload }) => {
             },
             body: JSON.stringify({
                 amount: editedAmount,
-                tipPercent: editedTipPercent ? (editedTipPercent / 100) : 0,
+                tipPercent: editedTipPercent ? editedTipPercent / 100 : 0,
+                currencyId: bill.currency.id,
             }),
-        })
+        });
         onReload();
         setIsInEditMode(false);
-    }
+    };
+
+    const totalInSpecifiedCurrency =
+        bill.tipPercent !== null
+            ? bill.amountInSpecifiedCurrency * (1 + bill.tipPercent)
+            : bill.amountInSpecifiedCurrency;
 
     return (
         <div className="max-w-4xl mx-auto p-6 relative">
-            <button onClick={() => setIsInEditMode(!isInEditMode)} className="absolute right-8 top-8">Edit</button>
+            <button
+                onClick={() => setIsInEditMode(!isInEditMode)}
+                className="absolute right-8 top-8"
+            >
+                {isInEditMode ? "Cancel" : "Edit"}
+            </button>
+
             <div className="bg-gray-800 shadow rounded-2xl p-6 mb-8">
-                <h1 className="text-2xl font-bold mb-4">
+                <h1 className="text-2xl font-bold mb-1">
                     Bill <span className="text-blue-600">#{bill.id}</span>
                 </h1>
+                <p className="text-xs text-slate-400 mb-4">
+                    Currency: <span className="font-medium">{bill.currency.symbol}</span>
+                    {" · "}
+                    {bill.currency.name}
+                </p>
 
                 <div className="space-y-2 mb-6">
                     <p className="text-sm text-slate-100">
                         {isInEditMode ? (
-                            <input type="number" defaultValue={bill.amount.toFixed(2)} className="bg-gray-700 text-white rounded px-2 py-1 w-32 text-right"
-                            onChange={(e) => {setEditedAmount(parseFloat(e.target.value))}}/>
+                            <input
+                                type="number"
+                                step="0.01"
+                                defaultValue={bill.amountInSpecifiedCurrency.toFixed(2)}
+                                className="bg-gray-700 text-white rounded px-2 py-1 w-40 text-right"
+                                onChange={(e) => {
+                                    const v = parseFloat(e.target.value);
+                                    setEditedAmount(Number.isNaN(v) ? 0 : v);
+                                }}
+                            />
                         ) : (
-                        <span className="font-medium">Amount: ${bill.amount.toFixed(2)}</span>
-                            )}
+                            <span className="font-medium">
+                Amount:{" "}
+                                {formatCurrency(
+                                    bill.amountInSpecifiedCurrency,
+                                    bill.currency.symbol
+                                )}
+              </span>
+                        )}
                     </p>
 
                     {bill.tipPercent !== null && (
                         <p className="text-sm text-slate-100">
                             {isInEditMode ? (
-                                <input type="number" defaultValue={bill.tipPercent * 100} className="bg-gray-700 text-white rounded px-2 py-1 w-32 text-right"
-                                       onChange={(e) => {setEditedTipPercent(parseFloat(e.target.value))}}/>
+                                <input
+                                    type="number"
+                                    step="0.01"
+                                    defaultValue={(bill.tipPercent * 100).toString()}
+                                    className="bg-gray-700 text-white rounded px-2 py-1 w-28 text-right"
+                                    onChange={(e) => {
+                                        const v = parseFloat(e.target.value);
+                                        setEditedTipPercent(Number.isNaN(v) ? 0 : v);
+                                    }}
+                                />
                             ) : (
-                                <span className="font-medium">Tip Percent: {bill.tipPercent * 100}%</span>
+                                <span className="font-medium">
+                  Tip Percent: {(bill.tipPercent * 100).toFixed(2)}%
+                </span>
                             )}
                         </p>
                     )}
 
                     {isInEditMode && (
-                        <button onClick={handleSave} className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+                        <button
+                            onClick={handleSave}
+                            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+                        >
                             Save
                         </button>
                     )}
 
-                    {bill.totalAmount !== undefined && (
-                        <p className="text-sm text-slate-100">
-                            <span className="font-medium">Total Amount:</span>{" "}
-                            ${bill.totalAmount.toFixed(2)}
-                        </p>
-                    )}
+                    <p className="text-sm text-slate-100">
+                        <span className="font-medium">Total Amount:</span>{" "}
+                        {formatCurrency(totalInSpecifiedCurrency, bill.currency.symbol)}
+                    </p>
 
                     <p className="text-xs text-slate-400">
                         Created: {new Date(bill.createdAt).toLocaleString()}
@@ -77,12 +125,12 @@ export const BillPage: React.FC<BillPageProps> = ({ bill, onReload }) => {
                     </p>
                 </div>
 
-                <h2 className="text-lg font-semibold border-b border-slate-200 pb-2 mb-4">
+                <h2 className="text-lg font-semibold border-b border-slate-700 pb-2 mb-4">
                     Participants
                 </h2>
 
                 {bill.participants && bill.participants.length > 0 ? (
-                    <ul className="divide-y divide-slate-200">
+                    <ul className="divide-y divide-slate-700">
                         {bill.participants.map((participant) => (
                             <li
                                 key={participant.id}
@@ -91,25 +139,39 @@ export const BillPage: React.FC<BillPageProps> = ({ bill, onReload }) => {
                 <span className="font-medium text-slate-100">
                   {participant.name}
                 </span>
-                                <div className="text-sm text-slate-500 space-x-3 mt-1 sm:mt-0">
-                                    {participant.declaredPercent !== undefined && (
+
+                                <div className="text-sm text-slate-400 flex flex-wrap gap-x-4 gap-y-1 mt-1 sm:mt-0">
+                                    {participant.customPercent !== undefined && (
                                         <span>
-                      Declared: {(participant.declaredPercent * 100).toFixed(2)}%
+                      Declared:{" "}
+                                            {(participant.customPercent * 100).toFixed(2)}%
                     </span>
                                     )}
-                                    {participant.declaredAmount !== undefined && (
+
+                                    {participant.customAmount !== undefined && (
                                         <span>
-                      Declared: ${participant.declaredAmount.toFixed(2)}
+                      Declared:{" "}
+                                            {formatCurrency(
+                                                participant.customAmount,
+                                                bill.currency.symbol
+                                            )}
                     </span>
                                     )}
+
                                     {participant.totalAmount !== undefined && (
                                         <span>
-                      Total: ${participant.totalAmount.toFixed(2)}
+                      Total:{" "}
+                                            {formatCurrency(
+                                                participant.totalAmount * Number(bill.currency.exchangeRate),
+                                                bill.currency.symbol
+                                            )}
                     </span>
                                     )}
+
                                     {participant.effectivePercent !== undefined && (
                                         <span>
-                      Effective: {(participant.effectivePercent * 100).toFixed(2)}%
+                      Effective:{" "}
+                                            {(participant.effectivePercent * 100).toFixed(2)}%
                     </span>
                                     )}
                                 </div>
@@ -117,14 +179,25 @@ export const BillPage: React.FC<BillPageProps> = ({ bill, onReload }) => {
                         ))}
                     </ul>
                 ) : (
-                    <p className="text-sm text-slate-500 italic">
-                        No participants found.
-                    </p>
+                    <p className="text-sm text-slate-500 italic">No participants found.</p>
                 )}
             </div>
-            <AddParticipants tipsPercent={bill.tipPercent} billAmount={bill.amount}
-                             initialParticipants={bill.participants} billId={bill.id}
-                             onReload={onReload}
+
+            <AddParticipants
+                tipsPercent={bill.tipPercent}
+                billAmount={bill.amountInSpecifiedCurrency}
+                billCurrency={bill.currency}
+                currencies={[new CurrencyDto(1, "USD", "USD", 1), new CurrencyDto(2, "UAH", "UAH", 42)]}
+                initialParticipants={bill.participants?.map(p => ({
+                    id: p.id,
+                    billId: bill.id,
+                    name: p.name,
+                    customPercent: p.customPercent ?? null,
+                    customAmount: p.customAmount ?? null,
+                    currencyId: p.currency.id,
+                }))}
+                billId={bill.id}
+                onReload={onReload}
             />
         </div>
     );

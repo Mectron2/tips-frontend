@@ -21,9 +21,9 @@ export const deleteBill = createAsyncThunk<number, number>(
     }
 );
 
-export const createBill = createAsyncThunk<Bill, { amount: string, tipPercent: string }>(
+export const createBill = createAsyncThunk<Bill, { amount: string, tipPercent: string, currencyId: number }>(
     "bills/create",
-    async (bill: { amount: string, tipPercent: string }) => {
+    async (bill: { amount: string, tipPercent: string, currencyId: number }) => {
         const res = await fetch("http://localhost:3000/bills", {
             method: "POST",
             headers: {
@@ -32,6 +32,7 @@ export const createBill = createAsyncThunk<Bill, { amount: string, tipPercent: s
             body: JSON.stringify({
                 amount: parseFloat(bill.amount),
                 tipPercent: parseFloat(bill.tipPercent) / 100,
+                currencyId: bill.currencyId,
             }),
         });
         if (!res.ok) throw new Error("Failed to create bill");

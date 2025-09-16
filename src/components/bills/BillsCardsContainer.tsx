@@ -1,9 +1,10 @@
 import { BillsCards } from "./BillsCards.tsx";
-import React, { useState } from "react";
+import React, {useState} from "react";
 import type { Bill } from "./types.tsx";
 import {useDispatch, useSelector} from "react-redux";
 import {createBill} from "../../redux/bills/slices/billsSlice.ts";
 import type {AppDispatch, RootState} from "../../redux/store.ts";
+import {selectAllCurrencies} from "../../redux/currrencies/slices/currencySlice.ts";
 
 type HolderProps = {
     bills?: Bill[];
@@ -17,7 +18,8 @@ export const BillsCardsContainer: React.FC<HolderProps> = ({ title = "Bills"}) =
     const bills = useSelector((state: RootState) => state.bills);
     const dispatch = useDispatch<AppDispatch>();
     const [showCreateForm, setShowCreateForm] = useState(false);
-    const [newBillCurrency, setNewBillCurrency] = useState("USD");
+    const [newBillCurrency, setNewBillCurrency] = useState(1);
+    const currencies = useSelector(selectAllCurrencies);
     const [formData, setFormData] = useState({
         amount: "",
         tipPercent: ""
@@ -26,9 +28,10 @@ export const BillsCardsContainer: React.FC<HolderProps> = ({ title = "Bills"}) =
     const handleCreateBill = async (e: React.FormEvent) => {
         e.preventDefault();
         dispatch(
-            createBill({ amount: formData.amount, tipPercent: formData.tipPercent })
+            createBill({ amount: formData.amount, tipPercent: formData.tipPercent, currencyId: newBillCurrency })
         )
         setFormData({ amount: "", tipPercent: "" });
+        setShowCreateForm(!showCreateForm);
     };
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -92,14 +95,17 @@ export const BillsCardsContainer: React.FC<HolderProps> = ({ title = "Bills"}) =
                                     placeholder="15"
                                 />
                             </div>
-                            <select name="select" onChange={(e) => setNewBillCurrency(e.target.value)}>
-                                <option value="USD" selected>USD</option>
-                                <option value="UAH">UAH</option>
+                            <select name="select" defaultValue="USD" onChange={(e) =>
+                                setNewBillCurrency(parseInt(e.target.value, 10))}>
+                                {currencies.map((c) => (
+                                    <option key={c.id} value={c.id}>
+                                        {c.symbol} · {c.name}
+                                    </option>
+                                ))}
                             </select>
                             <div className="flex gap-3">
                                 <button
                                     type="submit"
-                                    onClick={() => setShowCreateForm(false)}
                                     className="bg-green-600 hover:bg-green-700 disabled:bg-slate-400 disabled:cursor-not-allowed text-white px-4 py-2 rounded-md font-medium transition-colors"
                                 >
                                     {"Create Bill"}

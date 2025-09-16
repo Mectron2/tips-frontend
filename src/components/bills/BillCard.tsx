@@ -4,32 +4,12 @@ import { useNavigate } from "react-router-dom";
 import {useDispatch} from "react-redux";
 import {deleteBill} from "../../redux/bills/slices/billsSlice.ts";
 import type {AppDispatch} from "../../redux/store.ts";
+import {formatCurrency, formatDate, formatPercent} from "../../utils/currencyFuncs.ts";
 
 type Props = {
     bill: Bill;
     currency: string;
 };
-
-function formatCurrency(value: number, currency = "EUR") {
-    if (!isFinite(value)) return "—";
-    return new Intl.NumberFormat("ua-UA", {
-        style: "currency",
-        currency,
-        maximumFractionDigits: 2,
-    }).format(value);
-}
-
-function formatPercent(p: number) {
-    if (!isFinite(p)) return "—";
-    return `${(p * 100).toFixed(0)}%`;
-}
-
-function formatDate(iso?: string) {
-    if (!iso) return "—";
-    const d = new Date(iso);
-    if (Number.isNaN(d.getTime())) return "—";
-    return d.toLocaleString();
-}
 
 export const BillCard: React.FC<Props> = memo(({ bill, currency }) => {
     const amount = Number(bill.amount) * Number(bill.currency.exchangeRate);
