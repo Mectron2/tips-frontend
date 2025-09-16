@@ -39,7 +39,7 @@ export const createBill = createAsyncThunk<Bill, { amount: string, tipPercent: s
     }
 );
 
-interface BillsState {
+export interface BillsState {
     items: Bill[];
     loading: boolean;
     error: string | null;
@@ -64,38 +64,38 @@ export const billsSlice = createSlice({
     },
     extraReducers: (builder) => {
         builder
-            .addCase(loadBills.pending, (state: BillsState) => {
+            .addCase(loadBills.pending, (state) => {
                 state.loading = true;
                 state.error = null;
             })
-            .addCase(loadBills.fulfilled, (state: BillsState, action) => {
+            .addCase(loadBills.fulfilled, (state, action) => {
                 state.loading = false;
                 state.items = action.payload;
             })
-            .addCase(loadBills.rejected, (state: BillsState, action) => {
+            .addCase(loadBills.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.error.message ?? "Error loading bills";
             })
-            .addCase(deleteBill.pending, (state: BillsState) => {
+            .addCase(deleteBill.pending, (state) => {
                 state.loading = true;
             })
-            .addCase(deleteBill.fulfilled, (state: BillsState, action) => {
+            .addCase(deleteBill.fulfilled, (state, action) => {
                 state.loading = false;
                 state.items = state.items.filter((bill) => bill.id !== action.payload);
             })
-            .addCase(deleteBill.rejected, (state: BillsState, action) => {
+            .addCase(deleteBill.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.error.message ?? "Error deleting bill";
             })
-            .addCase(createBill.pending, (state: BillsState) => {
+            .addCase(createBill.pending, (state) => {
                 state.loading = true;
                 state.error = null;
             })
-            .addCase(createBill.fulfilled, (state: BillsState, action) => {
+            .addCase(createBill.fulfilled, (state, action) => {
                 state.loading = false;
                 state.items.push(action.payload);
             })
-            .addCase(createBill.rejected, (state: BillsState, action) => {
+            .addCase(createBill.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.error.message ?? "Error creating bill";
             });

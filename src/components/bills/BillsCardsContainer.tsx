@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import type { Bill } from "./types.tsx";
 import {useDispatch, useSelector} from "react-redux";
 import {createBill} from "../../redux/bills/slices/billsSlice.ts";
+import type {AppDispatch, RootState} from "../../redux/store.ts";
 
 type HolderProps = {
     bills?: Bill[];
@@ -13,8 +14,8 @@ type HolderProps = {
 };
 
 export const BillsCardsContainer: React.FC<HolderProps> = ({ title = "Bills"}) => {
-    const bills = useSelector((state) => state.bills);
-    const dispatch = useDispatch();
+    const bills = useSelector((state: RootState) => state.bills);
+    const dispatch = useDispatch<AppDispatch>();
     const [showCreateForm, setShowCreateForm] = useState(false);
     const [newBillCurrency, setNewBillCurrency] = useState("USD");
     const [formData, setFormData] = useState({

@@ -3,6 +3,7 @@ import type {Bill} from "./types";
 import { useNavigate } from "react-router-dom";
 import {useDispatch} from "react-redux";
 import {deleteBill} from "../../redux/bills/slices/billsSlice.ts";
+import type {AppDispatch} from "../../redux/store.ts";
 
 type Props = {
     bill: Bill;
@@ -31,12 +32,12 @@ function formatDate(iso?: string) {
 }
 
 export const BillCard: React.FC<Props> = memo(({ bill, currency }) => {
-    const amount = bill.amount * bill.currency.exchangeRate || 0;
+    const amount = Number(bill.amount) * Number(bill.currency.exchangeRate);
     const tipPercent = parseFloat(bill.tipPercent ?? "0") || 0;
     const tipAmountComputed = amount * tipPercent;
     const participantsCount = Array.isArray(bill.participants) ? bill.participants.length : 0;
     const navigate = useNavigate();
-    const dispatch = useDispatch();
+    const dispatch = useDispatch<AppDispatch>();
 
     return (
         <article className="bg-white dark:bg-slate-800 rounded-2xl shadow p-4 flex flex-col justify-between w-full relative"

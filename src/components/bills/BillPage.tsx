@@ -20,7 +20,7 @@ export const BillPage: React.FC<BillPageProps> = ({ bill, onReload }) => {
             },
             body: JSON.stringify({
                 amount: editedAmount,
-                tipPercent: editedTipPercent / 100,
+                tipPercent: editedTipPercent ? (editedTipPercent / 100) : 0,
             }),
         })
         onReload();

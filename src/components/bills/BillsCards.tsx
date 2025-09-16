@@ -3,11 +3,12 @@ import BillCard from "./BillCard";
 import {useDispatch, useSelector} from "react-redux";
 import {loadBills} from "../../redux/bills/slices/billsSlice.ts";
 import type {AppDispatch} from "../../redux/store.ts";
+import type {RootState} from "../../redux/store.ts";
 
 export const BillsCards: React.FC = () => {
     const dispatch = useDispatch<AppDispatch>();
     const { items: bills } = useSelector(
-        (state) => state.bills
+        (state: RootState) => state.bills
     );
 
     useEffect(() => {
