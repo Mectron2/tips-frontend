@@ -1,6 +1,6 @@
 import React from 'react';
 import type { BillDto } from './types.tsx';
-import { AddParticipants, CurrencyDto } from '../participants/AddParticipants.tsx';
+import { AddParticipants } from '../participants/AddParticipants.tsx';
 import { formatCurrency } from '../../utils/currencyFuncs.ts';
 
 interface BillPageProps {
@@ -75,6 +75,14 @@ export const BillPage: React.FC<BillPageProps> = ({ bill, onReload }) => {
                                     bill.currency.symbol
                                 )}
                             </span>
+                        )}
+                    </p>
+
+                    <p className="text-sm text-slate-100">
+                        {bill.dish ? (
+                            <span className="font-medium">Dish: {bill.dish.name}</span>
+                        ) : (
+                            <span className="italic text-slate-400">No dish specified</span>
                         )}
                     </p>
 
@@ -183,10 +191,6 @@ export const BillPage: React.FC<BillPageProps> = ({ bill, onReload }) => {
                 tipsPercent={bill.tipPercent}
                 billAmount={bill.amountInSpecifiedCurrency}
                 billCurrency={bill.currency}
-                currencies={[
-                    new CurrencyDto(1, 'USD', 'USD', 1),
-                    new CurrencyDto(2, 'UAH', 'UAH', 42),
-                ]}
                 initialParticipants={bill.participants?.map((p) => ({
                     id: p.id,
                     billId: bill.id,

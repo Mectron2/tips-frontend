@@ -6,40 +6,31 @@ import {
 } from '@reduxjs/toolkit';
 import type { RootState } from '../../store';
 
-type ApiCurrency = {
+type ApiDish = {
     id: number;
     name: string;
-    symbol: string;
-    exchangeRate: string;
+    price: string;
     createdAt: string;
     updatedAt: string;
 };
 
-export type Currency = {
+export type Dish = {
     id: number;
     name: string;
-    symbol: string;
-    exchangeRate: number;
+    price: number;
     createdAt: string;
     updatedAt: string;
 };
 
-export type CurrencyDto = {
-    id: number;
-    name: string;
-    symbol: string;
-    exchangeRate: string;
-}
-
-type CurrenciesState = {
-    byId: Record<number, Currency>;
+type DishesState = {
+    byId: Record<number, Dish>;
     allIds: number[];
     status: 'idle' | 'loading' | 'succeeded' | 'failed';
     error: string | null;
     lastFetched: number | null;
 };
 
-const initialState: CurrenciesState = {
+const initialState: DishesState = {
     byId: {},
     allIds: [],
     status: 'idle',
@@ -50,25 +41,25 @@ const initialState: CurrenciesState = {
 const API_BASE = import.meta.env.VITE_API_URL ?? 'http://localhost:3000';
 const CACHE_TTL_MS = 5 * 60 * 1000;
 
-const mapApiToCurrency = (c: ApiCurrency): Currency => ({
-    ...c,
-    exchangeRate: Number(c.exchangeRate),
+const mapApiToDish = (d: ApiDish): Dish => ({
+    ...d,
+    price: Number(d.price),
 });
 
-export const fetchCurrencies = createAsyncThunk<
-    Currency[],
+export const fetchDishes = createAsyncThunk<
+    Dish[],
     void,
     { state: RootState; rejectValue: string }
 >(
-    'currencies/fetchAll',
+    'dishes/fetchAll',
     async (_, { signal, rejectWithValue }) => {
         try {
-            const res = await fetch(`${API_BASE}/currency`, { signal });
+            const res = await fetch(`${API_BASE}/dishes`, { signal });
             if (!res.ok) {
                 return rejectWithValue(`HTTP ${res.status}`);
             }
-            const data = (await res.json()) as ApiCurrency[];
-            return data.map(mapApiToCurrency);
+            const data = (await res.json()) as ApiDish[];
+            return data.map(mapApiToDish);
         } catch (e) {
             // @ts-expect-error e is unknown
             return rejectWithValue(e.message ?? 'Network error');
@@ -76,15 +67,15 @@ export const fetchCurrencies = createAsyncThunk<
     },
     {
         condition: (_, { getState }) => {
-            const { status, lastFetched } = (getState() as RootState).currencies;
+            const { status, lastFetched } = (getState() as RootState).dishes;
             if (status === 'loading') return false;
             return !(lastFetched && Date.now() - lastFetched < CACHE_TTL_MS);
         },
     }
 );
 
-const currenciesSlice = createSlice({
-    name: 'currencies',
+const dishesSlice = createSlice({
+    name: 'dishes',
     initialState,
     reducers: {
         invalidate(state) {
@@ -93,43 +84,43 @@ const currenciesSlice = createSlice({
                 state.status = 'idle';
             }
         },
-        upsertMany(state, action: PayloadAction<Currency[]>) {
-            action.payload.forEach((c) => {
-                state.byId[c.id] = c;
-                if (!state.allIds.includes(c.id)) state.allIds.push(c.id);
+        upsertMany(state, action: PayloadAction<Dish[]>) {
+            action.payload.forEach((d) => {
+                state.byId[d.id] = d;
+                if (!state.allIds.includes(d.id)) state.allIds.push(d.id);
             });
         },
     },
     extraReducers: (builder) => {
         builder
-            .addCase(fetchCurrencies.pending, (state) => {
+            .addCase(fetchDishes.pending, (state) => {
                 state.status = 'loading';
                 state.error = null;
             })
-            .addCase(fetchCurrencies.fulfilled, (state, action: PayloadAction<Currency[]>) => {
+            .addCase(fetchDishes.fulfilled, (state, action: PayloadAction<Dish[]>) => {
                 state.status = 'succeeded';
                 state.error = null;
                 state.lastFetched = Date.now();
 
                 state.byId = {};
                 state.allIds = [];
-                for (const c of action.payload) {
-                    state.byId[c.id] = c;
-                    state.allIds.push(c.id);
+                for (const d of action.payload) {
+                    state.byId[d.id] = d;
+                    state.allIds.push(d.id);
                 }
             })
-            .addCase(fetchCurrencies.rejected, (state, action) => {
+            .addCase(fetchDishes.rejected, (state, action) => {
                 state.status = 'failed';
                 state.error = (action.payload as string) || action.error.message || 'Unknown error';
             });
     },
 });
 
-export const { invalidate, upsertMany } = currenciesSlice.actions;
-export default currenciesSlice;
+export const { invalidate, upsertMany } = dishesSlice.actions;
+export default dishesSlice;
 
-export const selectCurrenciesState = (state: RootState) => state.currencies;
+export const selectDishesState = (state: RootState) => state.dishes;
 
-export const selectAllCurrencies = createSelector([selectCurrenciesState], (s) =>
+export const selectAllDishes = createSelector([selectDishesState], (s) =>
     s.allIds.map((id) => s.byId[id])
 );

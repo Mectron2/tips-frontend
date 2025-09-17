@@ -1,10 +1,11 @@
 import { BillsCards } from './BillsCards.tsx';
-import React, { useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import type { Bill } from './types.tsx';
 import { useDispatch, useSelector } from 'react-redux';
 import { createBill } from '../../redux/bills/slices/billsSlice.ts';
 import type { AppDispatch, RootState } from '../../redux/store.ts';
 import { selectAllCurrencies } from '../../redux/currrencies/slices/currencySlice.ts';
+import {fetchDishes, selectAllDishes} from "../../redux/dishes/slices/DishSlice.ts";
 
 type HolderProps = {
     bills?: Bill[];
@@ -16,27 +17,47 @@ type HolderProps = {
 
 export const BillsCardsContainer: React.FC<HolderProps> = ({ title = 'Bills' }) => {
     const bills = useSelector((state: RootState) => state.bills);
+    const dishes = useSelector(selectAllDishes);
     const dispatch = useDispatch<AppDispatch>();
     const [showCreateForm, setShowCreateForm] = useState(false);
     const [newBillCurrency, setNewBillCurrency] = useState(1);
+    const [selectedDishId, setSelectedDishId] = useState<number | null>(null);
     const currencies = useSelector(selectAllCurrencies);
+    const [useCustomAmount, setUseCustomAmount] = useState(true);
     const [formData, setFormData] = useState({
         amount: '',
         tipPercent: '',
+        dishId: '',
     });
 
     const handleCreateBill = async (e: React.FormEvent) => {
         e.preventDefault();
-        dispatch(
-            createBill({
-                amount: formData.amount,
-                tipPercent: formData.tipPercent,
-                currencyId: newBillCurrency,
-            })
-        );
-        setFormData({ amount: '', tipPercent: '' });
-        setShowCreateForm(!showCreateForm);
+
+        const payload: any = {
+            tipPercent: formData.tipPercent,
+            currencyId: newBillCurrency,
+        };
+
+        console.log('Selected Dish ID:', selectedDishId);
+
+        if (useCustomAmount) {
+            payload.amount = formData.amount;
+        } else {
+            payload.dishId = selectedDishId;
+        }
+
+        console.log(payload);
+
+        dispatch(createBill(payload));
+
+        setFormData({ amount: '', tipPercent: '', dishId: '' });
+        setSelectedDishId(null);
+        setShowCreateForm(false);
     };
+
+    useEffect(() => {
+        dispatch(fetchDishes());
+    }, [dispatch]);
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -49,7 +70,7 @@ export const BillsCardsContainer: React.FC<HolderProps> = ({ title = 'Bills' }) 
                 <h2 className="text-2xl font-semibold">{title}</h2>
                 <div className="flex items-center gap-4">
                     <div className="text-sm text-slate-500">
-                        Total: {Array.isArray(bills) ? bills.length : 0}
+                        Total: {Array.isArray(bills.items) ? bills.items.length : 0}
                     </div>
                     <button
                         onClick={() => setShowCreateForm(!showCreateForm)}
@@ -71,18 +92,45 @@ export const BillsCardsContainer: React.FC<HolderProps> = ({ title = 'Bills' }) 
                             >
                                 Amount ({newBillCurrency})
                             </label>
-                            <input
-                                type="number"
-                                id="amount"
-                                name="amount"
-                                value={formData.amount}
-                                onChange={handleInputChange}
-                                step="0.01"
-                                min="0"
-                                required
-                                className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-slate-700 dark:text-white"
-                                placeholder="0.00"
-                            />
+                            <div>
+                                <label className="flex items-center gap-2 mb-2">
+                                    <input
+                                        type="checkbox"
+                                        checked={useCustomAmount}
+                                        onChange={() => setUseCustomAmount((prev) => !prev)}
+                                    />
+                                    Use Custom Amount
+                                </label>
+
+                                {useCustomAmount ? (
+                                    <input
+                                        type="number"
+                                        id="amount"
+                                        name="amount"
+                                        value={formData.amount}
+                                        onChange={handleInputChange}
+                                        step="0.01"
+                                        min="0"
+                                        required
+                                        className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-slate-700 dark:text-white"
+                                        placeholder="0.00"
+                                    />
+                                ) : (
+                                    <select
+                                        value={selectedDishId ?? ''}
+                                        onChange={(e) => setSelectedDishId(parseInt(e.target.value, 10))}
+                                        required
+                                        className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-slate-700 dark:text-white"
+                                    >
+                                        <option value="">Choose Dish</option>
+                                        {dishes.map((d) => (
+                                            <option key={d.id} value={d.id}>
+                                                {d.name} · {d.price}
+                                            </option>
+                                        ))}
+                                    </select>
+                                )}
+                            </div>
                         </div>
                         <div>
                             <label
@@ -127,7 +175,7 @@ export const BillsCardsContainer: React.FC<HolderProps> = ({ title = 'Bills' }) 
                                 type="button"
                                 onClick={() => {
                                     setShowCreateForm(false);
-                                    setFormData({ amount: '', tipPercent: '' });
+                                    setFormData({ amount: '', tipPercent: '', dishId: '' });
                                 }}
                                 className="bg-slate-500 hover:bg-slate-600 text-white px-4 py-2 rounded-md font-medium transition-colors"
                             >

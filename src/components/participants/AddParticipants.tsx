@@ -23,7 +23,6 @@ interface AddParticipantsProps {
     tipsPercent: number | null;
     billAmount: number;
     billCurrency: CurrencyDto;
-    currencies: CurrencyDto[];
     initialParticipants?: (Participant & { currencyId?: number })[];
     billId: number;
     onReload: () => void;
@@ -60,8 +59,6 @@ export const AddParticipants: React.FC<AddParticipantsProps> = ({
             ]
         ).map((p) => ({ ...p, currencyId: p.currencyId ?? billCurrency.id }))
     );
-
-    console.log(participants);
 
     const totalTips = tipsPercent ? billAmount * tipsPercent : 0;
 

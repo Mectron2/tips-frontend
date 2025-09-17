@@ -1,3 +1,6 @@
+import type {Dish} from "../../redux/dishes/slices/DishSlice.ts";
+import type {CurrencyDto} from "../../redux/currrencies/slices/currencySlice.ts";
+
 export type Participant = {
     id: number;
     billId: number;
@@ -10,12 +13,7 @@ export type ParticipantDto = {
     id: number;
     billId: number;
     name: string;
-    currency: {
-        id: number;
-        symbol: string;
-        name: string;
-        exchangeRate: string;
-    };
+    currency: CurrencyDto;
     customPercent?: number;
     customAmount?: number;
     totalAmount?: number;
@@ -27,16 +25,12 @@ export type BillDto = {
     id: number;
     amount: number;
     amountInSpecifiedCurrency: number;
-    currency: {
-        id: number;
-        symbol: string;
-        name: string;
-        exchangeRate: string;
-    };
+    currency: CurrencyDto;
     tipPercent: number | null;
     createdAt: string;
     updatedAt: string;
     totalAmount?: number;
+    dish?: Dish;
     participants?: ParticipantDto[];
 };
 
@@ -45,12 +39,7 @@ export type Bill = {
     amount: string;
     amountInSpecifiedCurrency: string;
     tipPercent: string;
-    currency: {
-        id: number;
-        symbol: string;
-        name: string;
-        exchangeRate: string;
-    };
+    currency: CurrencyDto;
     createdAt: string;
     updatedAt: string;
     participants: Participant[];
