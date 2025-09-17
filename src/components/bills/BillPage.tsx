@@ -153,7 +153,7 @@ export const BillPage: React.FC<BillPageProps> = ({ bill, onReload }) => {
                       Declared:{" "}
                                             {formatCurrency(
                                                 participant.customAmount,
-                                                bill.currency.symbol
+                                                participant.currency.symbol
                                             )}
                     </span>
                                     )}

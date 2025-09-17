@@ -215,12 +215,8 @@ export const AddParticipants: React.FC<AddParticipantsProps> = ({
 
     const calculateTotalAllocatedTips = (
         participants: (ParticipantCalculation & { currencyId: number })[]
-    ) => {
-        return participants.reduce(
-            (sum, p) => sum + p.totalAmount / rate(p.currencyId),
-            0
-        );
-    }
+    ) => participants.reduce((sum, p) => sum + p.totalAmount, 0);
+
 
     const totalAllocated = calculateTotalAllocatedTips(participantCalculations);
     const remainingTips = totalTips - totalAllocated;
