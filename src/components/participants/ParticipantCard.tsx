@@ -69,12 +69,12 @@ export const ParticipantCard: React.FC<ParticipantCardProps> = ({
 
     const percentInput =
         participant.customPercent !== null && participant.customPercent !== undefined
-            ? String(participant.customPercent * 100)
+            ? (participant.customPercent * 100).toFixed(2)
             : '';
 
     const amountInput =
         participant.customAmount !== null && participant.customAmount !== undefined
-            ? String(participant.customAmount)
+            ? (participant.customAmount).toFixed(2)
             : '';
 
     const amountInParticipantCurrency = convert(

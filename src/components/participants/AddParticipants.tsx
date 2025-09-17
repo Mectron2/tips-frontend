@@ -215,7 +215,11 @@ export const AddParticipants: React.FC<AddParticipantsProps> = ({
     ) => participants.reduce((sum, p) => sum + p.totalAmount, 0);
 
     const totalAllocated = calculateTotalAllocatedTips(participantCalculations);
-    const remainingTips = totalTips - totalAllocated;
+    const EPS = 1e-6;
+    const remainingTips = Math.abs(totalTips - totalAllocated) < EPS
+        ? 0
+        : totalTips - totalAllocated;
+
 
     return (
         <form
