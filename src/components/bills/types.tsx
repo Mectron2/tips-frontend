@@ -15,12 +15,13 @@ export type ParticipantDto = {
         symbol: string;
         name: string;
         exchangeRate: string;
-    }
+    };
     customPercent?: number;
     customAmount?: number;
     totalAmount?: number;
+    totalAmountInSpecifiedCurrency?: number;
     effectivePercent?: number;
-}
+};
 
 export type BillDto = {
     id: number;
@@ -31,13 +32,13 @@ export type BillDto = {
         symbol: string;
         name: string;
         exchangeRate: string;
-    }
+    };
     tipPercent: number | null;
     createdAt: string;
     updatedAt: string;
     totalAmount?: number;
     participants?: ParticipantDto[];
-}
+};
 
 export type Bill = {
     id: number;
@@ -49,7 +50,7 @@ export type Bill = {
         symbol: string;
         name: string;
         exchangeRate: string;
-    }
+    };
     createdAt: string;
     updatedAt: string;
     participants: Participant[];

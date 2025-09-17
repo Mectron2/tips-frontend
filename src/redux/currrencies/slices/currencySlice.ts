@@ -3,8 +3,8 @@ import {
     createAsyncThunk,
     type PayloadAction,
     createSelector,
-} from "@reduxjs/toolkit";
-import type { RootState } from "../../store";
+} from '@reduxjs/toolkit';
+import type { RootState } from '../../store';
 
 type ApiCurrency = {
     id: number;
@@ -27,7 +27,7 @@ export type Currency = {
 type CurrenciesState = {
     byId: Record<number, Currency>;
     allIds: number[];
-    status: "idle" | "loading" | "succeeded" | "failed";
+    status: 'idle' | 'loading' | 'succeeded' | 'failed';
     error: string | null;
     lastFetched: number | null;
 };
@@ -35,12 +35,12 @@ type CurrenciesState = {
 const initialState: CurrenciesState = {
     byId: {},
     allIds: [],
-    status: "idle",
+    status: 'idle',
     error: null,
     lastFetched: null,
 };
 
-const API_BASE = import.meta.env.VITE_API_URL ?? "http://localhost:3000";
+const API_BASE = import.meta.env.VITE_API_URL ?? 'http://localhost:3000';
 const CACHE_TTL_MS = 5 * 60 * 1000;
 
 const mapApiToCurrency = (c: ApiCurrency): Currency => ({
@@ -53,7 +53,7 @@ export const fetchCurrencies = createAsyncThunk<
     void,
     { state: RootState; rejectValue: string }
 >(
-    "currencies/fetchAll",
+    'currencies/fetchAll',
     async (_, { signal, rejectWithValue }) => {
         try {
             const res = await fetch(`${API_BASE}/currency`, { signal });
@@ -64,27 +64,26 @@ export const fetchCurrencies = createAsyncThunk<
             return data.map(mapApiToCurrency);
         } catch (e) {
             // @ts-expect-error e is unknown
-            return rejectWithValue(e.message ?? "Network error");
+            return rejectWithValue(e.message ?? 'Network error');
         }
     },
     {
         condition: (_, { getState }) => {
             const { status, lastFetched } = (getState() as RootState).currencies;
-            if (status === "loading") return false;
+            if (status === 'loading') return false;
             return !(lastFetched && Date.now() - lastFetched < CACHE_TTL_MS);
-            
         },
     }
 );
 
 const currenciesSlice = createSlice({
-    name: "currencies",
+    name: 'currencies',
     initialState,
     reducers: {
         invalidate(state) {
             state.lastFetched = null;
-            if (state.status === "succeeded") {
-                state.status = "idle";
+            if (state.status === 'succeeded') {
+                state.status = 'idle';
             }
         },
         upsertMany(state, action: PayloadAction<Currency[]>) {
@@ -97,30 +96,24 @@ const currenciesSlice = createSlice({
     extraReducers: (builder) => {
         builder
             .addCase(fetchCurrencies.pending, (state) => {
-                state.status = "loading";
+                state.status = 'loading';
                 state.error = null;
             })
-            .addCase(
-                fetchCurrencies.fulfilled,
-                (state, action: PayloadAction<Currency[]>) => {
-                    state.status = "succeeded";
-                    state.error = null;
-                    state.lastFetched = Date.now();
+            .addCase(fetchCurrencies.fulfilled, (state, action: PayloadAction<Currency[]>) => {
+                state.status = 'succeeded';
+                state.error = null;
+                state.lastFetched = Date.now();
 
-                    state.byId = {};
-                    state.allIds = [];
-                    for (const c of action.payload) {
-                        state.byId[c.id] = c;
-                        state.allIds.push(c.id);
-                    }
+                state.byId = {};
+                state.allIds = [];
+                for (const c of action.payload) {
+                    state.byId[c.id] = c;
+                    state.allIds.push(c.id);
                 }
-            )
+            })
             .addCase(fetchCurrencies.rejected, (state, action) => {
-                state.status = "failed";
-                state.error =
-                    (action.payload as string) ||
-                    action.error.message ||
-                    "Unknown error";
+                state.status = 'failed';
+                state.error = (action.payload as string) || action.error.message || 'Unknown error';
             });
     },
 });
@@ -130,7 +123,6 @@ export default currenciesSlice;
 
 export const selectCurrenciesState = (state: RootState) => state.currencies;
 
-export const selectAllCurrencies = createSelector(
-    [selectCurrenciesState],
-    (s) => s.allIds.map((id) => s.byId[id])
+export const selectAllCurrencies = createSelector([selectCurrenciesState], (s) =>
+    s.allIds.map((id) => s.byId[id])
 );

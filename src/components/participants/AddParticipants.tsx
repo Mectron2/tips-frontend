@@ -1,9 +1,9 @@
-import React, {useMemo, useState} from "react";
-import {ParticipantCards} from "./ParticipantCards";
-import {type Participant, type ParticipantCalculation} from "./types";
-import {formatCurrency} from "../../utils/currencyFuncs";
-import {useSelector} from "react-redux";
-import {selectAllCurrencies} from "../../redux/currrencies/slices/currencySlice.ts";
+import React, { useMemo, useState } from 'react';
+import { ParticipantCards } from './ParticipantCards';
+import { type Participant, type ParticipantCalculation } from './types';
+import { formatCurrency } from '../../utils/currencyFuncs';
+import { useSelector } from 'react-redux';
+import { selectAllCurrencies } from '../../redux/currrencies/slices/currencySlice.ts';
 
 export class CurrencyDto {
     id: number;
@@ -30,38 +30,35 @@ interface AddParticipantsProps {
 }
 
 export const AddParticipants: React.FC<AddParticipantsProps> = ({
-                                                                    tipsPercent,
-                                                                    billAmount,
-                                                                    billCurrency,
-                                                                    initialParticipants,
-                                                                    billId,
-                                                                    onReload,
-                                                                }) => {
+    tipsPercent,
+    billAmount,
+    billCurrency,
+    initialParticipants,
+    billId,
+    onReload,
+}) => {
     const currencies = useSelector(selectAllCurrencies);
 
-    const rate = (id: number) =>
-        Number(currencies.find((c) => c.id === id)?.exchangeRate ?? 1);
+    const rate = (id: number) => Number(currencies.find((c) => c.id === id)?.exchangeRate ?? 1);
 
-    const toBase = (amount: number, currencyId: number) =>
-        amount / rate(currencyId);
-    const baseTo = (amountBase: number, currencyId: number) =>
-        amountBase * rate(currencyId);
+    const toBase = (amount: number, currencyId: number) => amount / rate(currencyId);
+    const baseTo = (amountBase: number, currencyId: number) => amountBase * rate(currencyId);
     const convert = (amount: number, fromId: number, toId: number) =>
         baseTo(toBase(amount, fromId), toId);
 
-    const [participants, setParticipants] = useState<
-        (Participant & { currencyId: number })[]
-    >(
-        (initialParticipants ?? [
-            {
-                id: parseInt(Date.now().toString(), 10),
-                billId,
-                name: "",
-                customPercent: null,
-                customAmount: null,
-                currencyId: billCurrency.id,
-            },
-        ]).map((p) => ({ ...p, currencyId: p.currencyId ?? billCurrency.id }))
+    const [participants, setParticipants] = useState<(Participant & { currencyId: number })[]>(
+        (
+            initialParticipants ?? [
+                {
+                    id: parseInt(Date.now().toString(), 10),
+                    billId,
+                    name: '',
+                    customPercent: null,
+                    customAmount: null,
+                    currencyId: billCurrency.id,
+                },
+            ]
+        ).map((p) => ({ ...p, currencyId: p.currencyId ?? billCurrency.id }))
     );
 
     console.log(participants);
@@ -140,7 +137,7 @@ export const AddParticipants: React.FC<AddParticipantsProps> = ({
         }
 
         return results;
-       // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [participants, totalTips, billCurrency.id]);
 
     const handleParticipantChange = (
@@ -156,21 +153,21 @@ export const AddParticipants: React.FC<AddParticipantsProps> = ({
             prev.map((p) =>
                 p.id === participantId
                     ? {
-                        ...p,
-                        ...data,
-                        customPercent:
-                            data.customPercent !== undefined
-                                ? data.customPercent && data.customPercent > 0
-                                    ? data.customPercent
-                                    : null
-                                : p.customPercent,
-                        customAmount:
-                            data.customAmount !== undefined
-                                ? data.customAmount && data.customAmount > 0
-                                    ? data.customAmount
-                                    : null
-                                : p.customAmount,
-                    }
+                          ...p,
+                          ...data,
+                          customPercent:
+                              data.customPercent !== undefined
+                                  ? data.customPercent && data.customPercent > 0
+                                      ? data.customPercent
+                                      : null
+                                  : p.customPercent,
+                          customAmount:
+                              data.customAmount !== undefined
+                                  ? data.customAmount && data.customAmount > 0
+                                      ? data.customAmount
+                                      : null
+                                  : p.customAmount,
+                      }
                     : p
             )
         );
@@ -183,7 +180,7 @@ export const AddParticipants: React.FC<AddParticipantsProps> = ({
             {
                 id: newId,
                 billId,
-                name: "",
+                name: '',
                 customPercent: null,
                 customAmount: null,
                 currencyId: billCurrency.id,
@@ -200,12 +197,12 @@ export const AddParticipants: React.FC<AddParticipantsProps> = ({
         }));
 
         await fetch(`http://localhost:3000/participant/bill/${billId}`, {
-            method: "DELETE",
+            method: 'DELETE',
         });
 
-        await fetch("http://localhost:3000/participant", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
+        await fetch('http://localhost:3000/participant', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 billId,
                 createParticipantDtos: payload,
@@ -216,7 +213,6 @@ export const AddParticipants: React.FC<AddParticipantsProps> = ({
     const calculateTotalAllocatedTips = (
         participants: (ParticipantCalculation & { currencyId: number })[]
     ) => participants.reduce((sum, p) => sum + p.totalAmount, 0);
-
 
     const totalAllocated = calculateTotalAllocatedTips(participantCalculations);
     const remainingTips = totalTips - totalAllocated;
@@ -236,48 +232,42 @@ export const AddParticipants: React.FC<AddParticipantsProps> = ({
                 </h3>
                 <div className="grid grid-cols-2 gap-4 text-sm">
                     <div>
-            <span className="text-slate-600 dark:text-slate-400">
-              Total tip amount:
-            </span>
+                        <span className="text-slate-600 dark:text-slate-400">
+                            Total tip amount:
+                        </span>
                         <span className="ml-2 font-medium text-slate-900 dark:text-slate-100">
-              {formatCurrency(totalTips, billCurrency.symbol)}
-            </span>
+                            {formatCurrency(totalTips, billCurrency.symbol)}
+                        </span>
                     </div>
                     <div>
-            <span className="text-slate-600 dark:text-slate-400">
-              Distributed:
-            </span>
+                        <span className="text-slate-600 dark:text-slate-400">Distributed:</span>
                         <span className="ml-2 font-medium text-slate-900 dark:text-slate-100">
-              {formatCurrency(totalAllocated, billCurrency.symbol)}
-            </span>
+                            {formatCurrency(totalAllocated, billCurrency.symbol)}
+                        </span>
                     </div>
                     <div>
-            <span className="text-slate-600 dark:text-slate-400">
-              Remaining:
-            </span>
+                        <span className="text-slate-600 dark:text-slate-400">Remaining:</span>
                         <span
                             className={`ml-2 font-medium ${
                                 remainingTips < 0
-                                    ? "text-red-600"
-                                    : "text-slate-900 dark:text-slate-100"
+                                    ? 'text-red-600'
+                                    : 'text-slate-900 dark:text-slate-100'
                             }`}
                         >
-              {formatCurrency(remainingTips, billCurrency.symbol)}
-            </span>
+                            {formatCurrency(remainingTips, billCurrency.symbol)}
+                        </span>
                     </div>
                     <div>
-            <span className="text-slate-600 dark:text-slate-400">
-              Participants:
-            </span>
+                        <span className="text-slate-600 dark:text-slate-400">Participants:</span>
                         <span className="ml-2 font-medium text-slate-900 dark:text-slate-100">
-              {participants.length}
-            </span>
+                            {participants.length}
+                        </span>
                     </div>
                 </div>
 
                 {remainingTips < 0 && (
                     <div className="mt-2 p-2 bg-red-100 dark:bg-red-900/20 text-red-700 dark:text-red-300 text-sm rounded">
-                        ⚠️ The tip amount was exceeded by{" "}
+                        ⚠️ The tip amount was exceeded by{' '}
                         {formatCurrency(Math.abs(remainingTips), billCurrency.symbol)}
                     </div>
                 )}
@@ -297,9 +287,7 @@ export const AddParticipants: React.FC<AddParticipantsProps> = ({
                 participants={participantCalculations}
                 billCurrency={billCurrency}
                 onChange={handleParticipantChange}
-                onRemove={(id) =>
-                    setParticipants((prev) => prev.filter((p) => p.id !== id))
-                }
+                onRemove={(id) => setParticipants((prev) => prev.filter((p) => p.id !== id))}
             />
 
             <div className="flex gap-4 items-center">
@@ -319,16 +307,18 @@ export const AddParticipants: React.FC<AddParticipantsProps> = ({
                     transition-colors w-full p-3"
                     onClick={() =>
                         setParticipants(
-                            (initialParticipants ?? [
-                                {
-                                    id: parseInt(Date.now().toString(), 10),
-                                    billId,
-                                    name: "",
-                                    customPercent: null,
-                                    customAmount: null,
-                                    currencyId: billCurrency.id,
-                                },
-                            ]).map((p) => ({ ...p, currencyId: p.currencyId ?? billCurrency.id }))
+                            (
+                                initialParticipants ?? [
+                                    {
+                                        id: parseInt(Date.now().toString(), 10),
+                                        billId,
+                                        name: '',
+                                        customPercent: null,
+                                        customAmount: null,
+                                        currencyId: billCurrency.id,
+                                    },
+                                ]
+                            ).map((p) => ({ ...p, currencyId: p.currencyId ?? billCurrency.id }))
                         )
                     }
                 >

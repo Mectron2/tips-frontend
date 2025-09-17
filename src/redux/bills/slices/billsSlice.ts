@@ -1,44 +1,38 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import type { Bill } from "../../../components/bills/types";
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import type { Bill } from '../../../components/bills/types';
 
-export const loadBills = createAsyncThunk<Bill[]>(
-    "bills/load",
-    async () => {
-        const res = await fetch("http://localhost:3000/bills");
-        if (!res.ok) throw new Error("Failed to fetch bills");
-        return (await res.json()) as Bill[];
-    }
-);
+export const loadBills = createAsyncThunk<Bill[]>('bills/load', async () => {
+    const res = await fetch('http://localhost:3000/bills');
+    if (!res.ok) throw new Error('Failed to fetch bills');
+    return (await res.json()) as Bill[];
+});
 
-export const deleteBill = createAsyncThunk<number, number>(
-    "bills/delete",
-    async (id: number) => {
-        const res = await fetch(`http://localhost:3000/bills/${id}`, {
-            method: "DELETE",
-        });
-        if (!res.ok) throw new Error("Failed to delete bill");
-        return id;
-    }
-);
+export const deleteBill = createAsyncThunk<number, number>('bills/delete', async (id: number) => {
+    const res = await fetch(`http://localhost:3000/bills/${id}`, {
+        method: 'DELETE',
+    });
+    if (!res.ok) throw new Error('Failed to delete bill');
+    return id;
+});
 
-export const createBill = createAsyncThunk<Bill, { amount: string, tipPercent: string, currencyId: number }>(
-    "bills/create",
-    async (bill: { amount: string, tipPercent: string, currencyId: number }) => {
-        const res = await fetch("http://localhost:3000/bills", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                amount: parseFloat(bill.amount),
-                tipPercent: parseFloat(bill.tipPercent) / 100,
-                currencyId: bill.currencyId,
-            }),
-        });
-        if (!res.ok) throw new Error("Failed to create bill");
-        return (await res.json() as Bill);
-    }
-);
+export const createBill = createAsyncThunk<
+    Bill,
+    { amount: string; tipPercent: string; currencyId: number }
+>('bills/create', async (bill: { amount: string; tipPercent: string; currencyId: number }) => {
+    const res = await fetch('http://localhost:3000/bills', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            amount: parseFloat(bill.amount),
+            tipPercent: parseFloat(bill.tipPercent) / 100,
+            currencyId: bill.currencyId,
+        }),
+    });
+    if (!res.ok) throw new Error('Failed to create bill');
+    return (await res.json()) as Bill;
+});
 
 export interface BillsState {
     items: Bill[];
@@ -53,7 +47,7 @@ const initialState: BillsState = {
 };
 
 export const billsSlice = createSlice({
-    name: "bills",
+    name: 'bills',
     initialState,
     reducers: {
         addBill: (state, action) => {
@@ -75,7 +69,7 @@ export const billsSlice = createSlice({
             })
             .addCase(loadBills.rejected, (state, action) => {
                 state.loading = false;
-                state.error = action.error.message ?? "Error loading bills";
+                state.error = action.error.message ?? 'Error loading bills';
             })
             .addCase(deleteBill.pending, (state) => {
                 state.loading = true;
@@ -86,7 +80,7 @@ export const billsSlice = createSlice({
             })
             .addCase(deleteBill.rejected, (state, action) => {
                 state.loading = false;
-                state.error = action.error.message ?? "Error deleting bill";
+                state.error = action.error.message ?? 'Error deleting bill';
             })
             .addCase(createBill.pending, (state) => {
                 state.loading = true;
@@ -98,7 +92,7 @@ export const billsSlice = createSlice({
             })
             .addCase(createBill.rejected, (state, action) => {
                 state.loading = false;
-                state.error = action.error.message ?? "Error creating bill";
+                state.error = action.error.message ?? 'Error creating bill';
             });
     },
 });

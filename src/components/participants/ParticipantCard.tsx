@@ -1,8 +1,8 @@
-import React from "react";
-import type { ParticipantCalculation } from "./types";
-import { formatCurrency } from "../../utils/currencyFuncs";
-import { useSelector } from "react-redux";
-import { selectAllCurrencies } from "../../redux/currrencies/slices/currencySlice.ts";
+import React from 'react';
+import type { ParticipantCalculation } from './types';
+import { formatCurrency } from '../../utils/currencyFuncs';
+import { useSelector } from 'react-redux';
+import { selectAllCurrencies } from '../../redux/currrencies/slices/currencySlice.ts';
 
 type CurrencyDto = {
     id: number;
@@ -27,15 +27,14 @@ interface ParticipantCardProps {
 }
 
 export const ParticipantCard: React.FC<ParticipantCardProps> = ({
-                                                                    participant,
-                                                                    billCurrency,
-                                                                    onChange,
-                                                                    onRemove,
-                                                                }) => {
+    participant,
+    billCurrency,
+    onChange,
+    onRemove,
+}) => {
     const currencies = useSelector(selectAllCurrencies) ?? [];
 
-    const rate = (id: number) =>
-        Number(currencies.find((c) => c.id === id)?.exchangeRate ?? 1);
+    const rate = (id: number) => Number(currencies.find((c) => c.id === id)?.exchangeRate ?? 1);
     const toBase = (amount: number, currencyId: number) => amount / rate(currencyId);
     const baseTo = (amountBase: number, currencyId: number) => amountBase * rate(currencyId);
     const convert = (amount: number, fromId: number, toId: number) =>
@@ -47,20 +46,20 @@ export const ParticipantCard: React.FC<ParticipantCardProps> = ({
 
     const handlePercentChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const raw = e.target.value.trim();
-        const num = raw === "" ? null : Number(raw);
+        const num = raw === '' ? null : Number(raw);
         const percentValue = num === null || Number.isNaN(num) ? null : num / 100;
         onChange(participant.id, {
             customPercent: percentValue,
-            customAmount: raw !== "" ? null : participant.customAmount ?? null,
+            customAmount: raw !== '' ? null : (participant.customAmount ?? null),
         });
     };
 
     const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const raw = e.target.value.trim();
-        const amountValue = raw === "" ? null : Number(raw);
+        const amountValue = raw === '' ? null : Number(raw);
         onChange(participant.id, {
             customAmount: amountValue,
-            customPercent: raw !== "" ? null : participant.customPercent ?? null,
+            customPercent: raw !== '' ? null : (participant.customPercent ?? null),
         });
     };
 
@@ -71,12 +70,12 @@ export const ParticipantCard: React.FC<ParticipantCardProps> = ({
     const percentInput =
         participant.customPercent !== null && participant.customPercent !== undefined
             ? String(participant.customPercent * 100)
-            : "";
+            : '';
 
     const amountInput =
         participant.customAmount !== null && participant.customAmount !== undefined
             ? String(participant.customAmount)
-            : "";
+            : '';
 
     const amountInParticipantCurrency = convert(
         participant.totalAmount,
@@ -104,7 +103,7 @@ export const ParticipantCard: React.FC<ParticipantCardProps> = ({
                     </label>
                     <input
                         type="text"
-                        value={participant.name ?? ""}
+                        value={participant.name ?? ''}
                         required
                         onChange={handleNameChange}
                         className="mt-1 w-full rounded-md border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-blue-500"
@@ -167,18 +166,15 @@ export const ParticipantCard: React.FC<ParticipantCardProps> = ({
                 <div className="text-sm text-slate-600 dark:text-slate-400 flex justify-between">
                     <span>Payment due:</span>
                     <span className="font-medium text-slate-900 dark:text-slate-100">
-            {formatCurrency(
-                amountInParticipantCurrency,
-                participantCurrency.symbol
-            )}
-          </span>
+                        {formatCurrency(amountInParticipantCurrency, participantCurrency.symbol)}
+                    </span>
                 </div>
 
                 <div className="text-sm text-slate-600 dark:text-slate-400 flex justify-between">
                     <span>Effective %:</span>
                     <span className="font-medium text-slate-900 dark:text-slate-100">
-            {(participant.effectivePercent * 100).toFixed(2)}%
-          </span>
+                        {(participant.effectivePercent * 100).toFixed(2)}%
+                    </span>
                 </div>
             </div>
         </div>

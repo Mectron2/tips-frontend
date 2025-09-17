@@ -13,8 +13,9 @@ export interface ParticipantCalculation extends Participant {
 
 export class ParticipantDto {
     name: string | null;
-    customPercent?: number | null
+    customPercent?: number | null;
     customAmount?: number | null;
+    totalAmountInSpecifiedCurrency?: number | null;
 
     constructor(name: string | null, customPercent?: number | null, customAmount?: number | null) {
         this.name = name;

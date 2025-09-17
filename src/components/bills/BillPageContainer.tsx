@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react";
-import { BillPage } from "./BillPage";
-import type { BillDto } from "./types";
-import {useParams} from "react-router-dom";
+import { useEffect, useState } from 'react';
+import { BillPage } from './BillPage';
+import type { BillDto } from './types';
+import { useParams } from 'react-router-dom';
 
 export const BillPageContainer = () => {
     const { id } = useParams();
@@ -12,7 +12,7 @@ export const BillPageContainer = () => {
         fetch(`http://localhost:3000/bills/${id}`)
             .then((res) => res.json())
             .then((data) => setBill(data))
-            .catch((err) => console.error("Error loading bill:", err))
+            .catch((err) => console.error('Error loading bill:', err))
             .finally(() => setLoading(false));
     }, [id]);
 
@@ -20,7 +20,7 @@ export const BillPageContainer = () => {
         fetch(`http://localhost:3000/bills/${id}`)
             .then((res) => res.json())
             .then((data) => setBill(data))
-            .catch((err) => console.error("Error loading bill:", err))
+            .catch((err) => console.error('Error loading bill:', err));
     };
 
     if (loading) return <p className="text-center">Loading...</p>;

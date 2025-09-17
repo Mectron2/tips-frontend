@@ -1,6 +1,6 @@
-import React from "react";
-import { ParticipantCard } from "./ParticipantCard";
-import type { ParticipantCalculation } from "./types";
+import React from 'react';
+import { ParticipantCard } from './ParticipantCard';
+import type { ParticipantCalculation } from './types';
 
 type CurrencyDto = {
     id: number;
@@ -25,11 +25,11 @@ interface ParticipantCardsProps {
 }
 
 export const ParticipantCards: React.FC<ParticipantCardsProps> = ({
-                                                                      participants,
-                                                                      billCurrency,
-                                                                      onChange,
-                                                                      onRemove,
-                                                                  }) => {
+    participants,
+    billCurrency,
+    onChange,
+    onRemove,
+}) => {
     const sortedParticipants = [...participants].sort((a, b) => b.id - a.id);
 
     return (

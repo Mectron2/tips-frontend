@@ -1,7 +1,7 @@
-import React from "react";
-import type { BillDto } from "./types.tsx";
-import {AddParticipants, CurrencyDto} from "../participants/AddParticipants.tsx";
-import { formatCurrency } from "../../utils/currencyFuncs.ts";
+import React from 'react';
+import type { BillDto } from './types.tsx';
+import { AddParticipants, CurrencyDto } from '../participants/AddParticipants.tsx';
+import { formatCurrency } from '../../utils/currencyFuncs.ts';
 
 interface BillPageProps {
     bill: BillDto;
@@ -11,18 +11,14 @@ interface BillPageProps {
 export const BillPage: React.FC<BillPageProps> = ({ bill, onReload }) => {
     const [isInEditMode, setIsInEditMode] = React.useState(false);
 
-    const [editedAmount, setEditedAmount] = React.useState<number>(
-        bill.amountInSpecifiedCurrency
-    );
-    const [editedTipPercent, setEditedTipPercent] = React.useState<number | null>(
-        bill.tipPercent
-    );
+    const [editedAmount, setEditedAmount] = React.useState<number>(bill.amountInSpecifiedCurrency);
+    const [editedTipPercent, setEditedTipPercent] = React.useState<number | null>(bill.tipPercent);
 
     const handleSave = async () => {
         await fetch(`http://localhost:3000/bills/${bill.id}`, {
-            method: "PATCH",
+            method: 'PATCH',
             headers: {
-                "Content-Type": "application/json",
+                'Content-Type': 'application/json',
             },
             body: JSON.stringify({
                 amount: editedAmount,
@@ -45,7 +41,7 @@ export const BillPage: React.FC<BillPageProps> = ({ bill, onReload }) => {
                 onClick={() => setIsInEditMode(!isInEditMode)}
                 className="absolute right-8 top-8"
             >
-                {isInEditMode ? "Cancel" : "Edit"}
+                {isInEditMode ? 'Cancel' : 'Edit'}
             </button>
 
             <div className="bg-gray-800 shadow rounded-2xl p-6 mb-8">
@@ -54,7 +50,7 @@ export const BillPage: React.FC<BillPageProps> = ({ bill, onReload }) => {
                 </h1>
                 <p className="text-xs text-slate-400 mb-4">
                     Currency: <span className="font-medium">{bill.currency.symbol}</span>
-                    {" · "}
+                    {' · '}
                     {bill.currency.name}
                 </p>
 
@@ -73,12 +69,12 @@ export const BillPage: React.FC<BillPageProps> = ({ bill, onReload }) => {
                             />
                         ) : (
                             <span className="font-medium">
-                Amount:{" "}
+                                Amount:{' '}
                                 {formatCurrency(
                                     bill.amountInSpecifiedCurrency,
                                     bill.currency.symbol
                                 )}
-              </span>
+                            </span>
                         )}
                     </p>
 
@@ -97,8 +93,8 @@ export const BillPage: React.FC<BillPageProps> = ({ bill, onReload }) => {
                                 />
                             ) : (
                                 <span className="font-medium">
-                  Tip Percent: {(bill.tipPercent * 100).toFixed(2)}%
-                </span>
+                                    Tip Percent: {(bill.tipPercent * 100).toFixed(2)}%
+                                </span>
                             )}
                         </p>
                     )}
@@ -113,7 +109,7 @@ export const BillPage: React.FC<BillPageProps> = ({ bill, onReload }) => {
                     )}
 
                     <p className="text-sm text-slate-100">
-                        <span className="font-medium">Total Amount:</span>{" "}
+                        <span className="font-medium">Total Amount:</span>{' '}
                         {formatCurrency(totalInSpecifiedCurrency, bill.currency.symbol)}
                     </p>
 
@@ -136,43 +132,43 @@ export const BillPage: React.FC<BillPageProps> = ({ bill, onReload }) => {
                                 key={participant.id}
                                 className="py-3 flex flex-col sm:flex-row sm:items-center sm:justify-between"
                             >
-                <span className="font-medium text-slate-100">
-                  {participant.name}
-                </span>
+                                <span className="font-medium text-slate-100">
+                                    {participant.name}
+                                </span>
 
                                 <div className="text-sm text-slate-400 flex flex-wrap gap-x-4 gap-y-1 mt-1 sm:mt-0">
                                     {participant.customPercent !== undefined && (
                                         <span>
-                      Declared:{" "}
-                                            {(participant.customPercent * 100).toFixed(2)}%
-                    </span>
+                                            Declared: {(participant.customPercent * 100).toFixed(2)}
+                                            %
+                                        </span>
                                     )}
 
                                     {participant.customAmount !== undefined && (
                                         <span>
-                      Declared:{" "}
+                                            Declared:{' '}
                                             {formatCurrency(
                                                 participant.customAmount,
                                                 participant.currency.symbol
                                             )}
-                    </span>
+                                        </span>
                                     )}
 
                                     {participant.totalAmount !== undefined && (
                                         <span>
-                      Total:{" "}
+                                            Total:{' '}
                                             {formatCurrency(
-                                                participant.totalAmount * Number(bill.currency.exchangeRate),
-                                                bill.currency.symbol
+                                                participant.totalAmountInSpecifiedCurrency || participant.totalAmount,
+                                                participant.currency.symbol || bill.currency.symbol
                                             )}
-                    </span>
+                                        </span>
                                     )}
 
                                     {participant.effectivePercent !== undefined && (
                                         <span>
-                      Effective:{" "}
+                                            Effective:{' '}
                                             {(participant.effectivePercent * 100).toFixed(2)}%
-                    </span>
+                                        </span>
                                     )}
                                 </div>
                             </li>
@@ -187,8 +183,11 @@ export const BillPage: React.FC<BillPageProps> = ({ bill, onReload }) => {
                 tipsPercent={bill.tipPercent}
                 billAmount={bill.amountInSpecifiedCurrency}
                 billCurrency={bill.currency}
-                currencies={[new CurrencyDto(1, "USD", "USD", 1), new CurrencyDto(2, "UAH", "UAH", 42)]}
-                initialParticipants={bill.participants?.map(p => ({
+                currencies={[
+                    new CurrencyDto(1, 'USD', 'USD', 1),
+                    new CurrencyDto(2, 'UAH', 'UAH', 42),
+                ]}
+                initialParticipants={bill.participants?.map((p) => ({
                     id: p.id,
                     billId: bill.id,
                     name: p.name,
