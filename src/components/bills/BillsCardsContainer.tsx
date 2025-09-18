@@ -20,7 +20,7 @@ export const BillsCardsContainer: React.FC<HolderProps> = ({ title = 'Bills' }) 
     const dishes = useSelector(selectAllDishes);
     const dispatch = useDispatch<AppDispatch>();
     const [showCreateForm, setShowCreateForm] = useState(false);
-    const [newBillCurrency, setNewBillCurrency] = useState(1);
+    const [newBillCurrency, setNewBillCurrency] = useState<number | null>(null);
     const [selectedDishId, setSelectedDishId] = useState<number | null>(null);
     const currencies = useSelector(selectAllCurrencies);
     const [useCustomAmount, setUseCustomAmount] = useState(true);
@@ -34,6 +34,8 @@ export const BillsCardsContainer: React.FC<HolderProps> = ({ title = 'Bills' }) 
         e.preventDefault();
 
         let payload: BillPayload;
+
+        if (!newBillCurrency) return;
 
         if (useCustomAmount) {
             payload = {
@@ -93,7 +95,7 @@ export const BillsCardsContainer: React.FC<HolderProps> = ({ title = 'Bills' }) 
                                 htmlFor="amount"
                                 className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1"
                             >
-                                Amount ({newBillCurrency})
+                                Amount ({currencies.find(c => c.id === newBillCurrency)?.symbol || 'Choose Currency'})
                             </label>
                             <div>
                                 <label className="flex items-center gap-2 mb-2">
@@ -158,8 +160,11 @@ export const BillsCardsContainer: React.FC<HolderProps> = ({ title = 'Bills' }) 
                         </div>
                         <select
                             name="select"
+                            value={newBillCurrency ?? ''}
+                            required
                             onChange={(e) => setNewBillCurrency(parseInt(e.target.value, 10))}
                         >
+                            <option value='' disabled>Choose Currency</option>
                             {currencies.map((c) => (
                                 <option key={c.id} value={c.id}>
                                     {c.symbol} · {c.name}
@@ -169,7 +174,9 @@ export const BillsCardsContainer: React.FC<HolderProps> = ({ title = 'Bills' }) 
                         <div className="flex gap-3">
                             <button
                                 type="submit"
-                                disabled={(!useCustomAmount && selectedDishId === null) || (useCustomAmount && formData.amount === '') || formData.tipPercent === ''}
+                                disabled={(!useCustomAmount && selectedDishId === null)
+                                    || (useCustomAmount && formData.amount === '')
+                                    || formData.tipPercent === '' || newBillCurrency === null}
                                 className="bg-green-600 hover:bg-green-700 disabled:bg-slate-400 disabled:cursor-not-allowed text-white px-4 py-2 rounded-md font-medium transition-colors"
                             >
                                 Create Bill
