@@ -2,7 +2,7 @@ import { BillsCards } from './BillsCards.tsx';
 import React, {useEffect, useState} from 'react';
 import type { Bill } from './types.tsx';
 import { useDispatch, useSelector } from 'react-redux';
-import { createBill } from '../../redux/bills/slices/billsSlice.ts';
+import {type BillPayload, createBill} from '../../redux/bills/slices/billsSlice.ts';
 import type { AppDispatch, RootState } from '../../redux/store.ts';
 import { selectAllCurrencies } from '../../redux/currrencies/slices/currencySlice.ts';
 import {fetchDishes, selectAllDishes} from "../../redux/dishes/slices/DishSlice.ts";
@@ -33,27 +33,30 @@ export const BillsCardsContainer: React.FC<HolderProps> = ({ title = 'Bills' }) 
     const handleCreateBill = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        const payload: any = {
-            tipPercent: formData.tipPercent,
-            currencyId: newBillCurrency,
-        };
-
-        console.log('Selected Dish ID:', selectedDishId);
+        let payload: BillPayload;
 
         if (useCustomAmount) {
-            payload.amount = formData.amount;
+            payload = {
+                tipPercent: formData.tipPercent,
+                currencyId: newBillCurrency,
+                amount: formData.amount,
+            };
+        } else if (selectedDishId !== null) {
+            payload = {
+                tipPercent: formData.tipPercent,
+                currencyId: newBillCurrency,
+                dishId: selectedDishId,
+            };
         } else {
-            payload.dishId = selectedDishId;
+            return;
         }
 
-        console.log(payload);
-
         dispatch(createBill(payload));
-
         setFormData({ amount: '', tipPercent: '', dishId: '' });
         setSelectedDishId(null);
         setShowCreateForm(false);
     };
+
 
     useEffect(() => {
         dispatch(fetchDishes());
@@ -122,7 +125,7 @@ export const BillsCardsContainer: React.FC<HolderProps> = ({ title = 'Bills' }) 
                                         required
                                         className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-slate-700 dark:text-white"
                                     >
-                                        <option value="">Choose Dish</option>
+                                        <option value="" disabled>Choose Dish</option>
                                         {dishes.map((d) => (
                                             <option key={d.id} value={d.id}>
                                                 {d.name} · {d.price}
@@ -155,7 +158,6 @@ export const BillsCardsContainer: React.FC<HolderProps> = ({ title = 'Bills' }) 
                         </div>
                         <select
                             name="select"
-                            defaultValue="USD"
                             onChange={(e) => setNewBillCurrency(parseInt(e.target.value, 10))}
                         >
                             {currencies.map((c) => (
@@ -167,9 +169,10 @@ export const BillsCardsContainer: React.FC<HolderProps> = ({ title = 'Bills' }) 
                         <div className="flex gap-3">
                             <button
                                 type="submit"
+                                disabled={(!useCustomAmount && selectedDishId === null) || (useCustomAmount && formData.amount === '') || formData.tipPercent === ''}
                                 className="bg-green-600 hover:bg-green-700 disabled:bg-slate-400 disabled:cursor-not-allowed text-white px-4 py-2 rounded-md font-medium transition-colors"
                             >
-                                {'Create Bill'}
+                                Create Bill
                             </button>
                             <button
                                 type="button"

@@ -15,21 +15,37 @@ export const deleteBill = createAsyncThunk<number, number>('bills/delete', async
     return id;
 });
 
+type BillPayloadBase = {
+    tipPercent: string;
+    currencyId: number;
+};
+
+type BillPayloadWithAmount = BillPayloadBase & {
+    amount: string;
+    dishId?: never;
+};
+
+type BillPayloadWithDish = BillPayloadBase & {
+    dishId: number;
+    amount?: never;
+};
+
+export type BillPayload = BillPayloadWithAmount | BillPayloadWithDish;
+
 export const createBill = createAsyncThunk<
     Bill,
-    { amount: string; tipPercent: string; currencyId: number, dishId: number }
->('bills/create', async (bill: {
-    dishId: number; amount: string; tipPercent: string; currencyId: number }) => {
+    BillPayload
+>('bills/create', async (bill: BillPayload) => {
     const res = await fetch('http://localhost:3000/bills', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-            amount: parseFloat(bill.amount),
+            amount: bill.amount ? parseFloat(bill.amount) : undefined,
             tipPercent: parseFloat(bill.tipPercent) / 100,
             currencyId: bill.currencyId,
-            dishId: bill.dishId,
+            dishId: bill.dishId ? bill.dishId : undefined,
         }),
     });
     if (!res.ok) throw new Error('Failed to create bill');
